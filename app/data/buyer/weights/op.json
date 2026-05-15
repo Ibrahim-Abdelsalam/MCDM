@@ -1,0 +1,15 @@
+{
+  "scheme_name": "OP",
+  "entity_type": "buyer",
+  "weights": {
+    "Financial Stability & Creditworthiness": 1.0,
+    "Payment Performance": 1.3000000000000003,
+    "Order Volume & Growth Potential": 1.0,
+    "Demand Stability & Predictability": 1.3000000000000003,
+    "Responsiveness & Collaboration": 1.0,
+    "Compliance & Regulatory Standards": 1.0,
+    "Technical Sophistication & Systems Integration": 1.0,
+    "Market Reputation & Brand Impact": 1.0,
+    "Long-Term Strategic Value": 1.0
+  }
+}

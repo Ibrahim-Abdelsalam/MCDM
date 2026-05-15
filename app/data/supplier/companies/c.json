@@ -1,0 +1,15 @@
+{
+  "company_name": "C",
+  "entity_type": "supplier",
+  "scores": {
+    "Quality Performance": 5,
+    "Delivery Performance": 5,
+    "Cost Competitiveness": 5,
+    "Financial Stability": 5,
+    "Technical Capability": 5,
+    "Compliance & Sustainability": 5,
+    "Systems Integration": 5,
+    "Flexibility": 3,
+    "Experience & Track Record": 4
+  }
+}

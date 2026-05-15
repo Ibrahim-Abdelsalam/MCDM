@@ -1,0 +1,15 @@
+{
+  "scheme_name": "y",
+  "entity_type": "supplier",
+  "weights": {
+    "Quality Performance": 5.0,
+    "Delivery Performance": 1.0,
+    "Cost Competitiveness": 5.0,
+    "Financial Stability": 5.0,
+    "Technical Capability": 5.0,
+    "Compliance & Sustainability": 5.0,
+    "Systems Integration": 3.0,
+    "Flexibility": 3.0,
+    "Experience & Track Record": 6.0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "company_name": "supplier a",
+  "entity_type": "supplier",
+  "scores": {
+    "Quality Performance": 6,
+    "Delivery Performance": 3,
+    "Cost Competitiveness": 7,
+    "Financial Stability": 3,
+    "Technical Capability": 7,
+    "Compliance & Sustainability": 3,
+    "Systems Integration": 7,
+    "Flexibility": 4,
+    "Experience & Track Record": 5
+  }
+}

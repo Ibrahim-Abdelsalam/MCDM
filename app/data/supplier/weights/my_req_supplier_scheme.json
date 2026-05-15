@@ -1,0 +1,15 @@
+{
+  "scheme_name": "my req (supplier scheme)",
+  "entity_type": "supplier",
+  "weights": {
+    "Quality Performance": 2.000000000000001,
+    "Delivery Performance": 1.0,
+    "Cost Competitiveness": 5.0,
+    "Financial Stability": 9.0,
+    "Technical Capability": 3.0,
+    "Compliance & Sustainability": 4.0,
+    "Systems Integration": 9.0,
+    "Flexibility": 3.0,
+    "Experience & Track Record": 8.0
+  }
+}

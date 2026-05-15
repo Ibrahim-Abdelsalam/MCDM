@@ -1,0 +1,15 @@
+{
+  "company_name": "m",
+  "entity_type": "buyer",
+  "scores": {
+    "Financial Stability & Creditworthiness": 5,
+    "Payment Performance": 5,
+    "Order Volume & Growth Potential": 5,
+    "Demand Stability & Predictability": 5,
+    "Responsiveness & Collaboration": 5,
+    "Compliance & Regulatory Standards": 5,
+    "Technical Sophistication & Systems Integration": 5,
+    "Market Reputation & Brand Impact": 5,
+    "Long-Term Strategic Value": 2
+  }
+}

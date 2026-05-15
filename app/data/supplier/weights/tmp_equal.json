@@ -1,0 +1,15 @@
+{
+  "scheme_name": "tmp_equal",
+  "entity_type": "supplier",
+  "weights": {
+    "Quality Performance": 1,
+    "Delivery Performance": 1,
+    "Cost Competitiveness": 1,
+    "Financial Stability": 1,
+    "Technical Capability": 1,
+    "Compliance & Sustainability": 1,
+    "Systems Integration": 1,
+    "Flexibility": 1,
+    "Experience & Track Record": 1
+  }
+}
