@@ -1,0 +1,34 @@
+# Environments
+.venv_pyqt/
+venv/
+env/
+.env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Results / Outputs (Don't commit local runs)
+app/data/results/*.xlsx
+app/data/results/*.png
+app/data/results/*.csv
+!app/data/results/.gitkeep
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Academic Drafts (Holding Folder)
+Academic_Drafts_and_Notes/
