@@ -6,7 +6,7 @@
 
 > **Note:** This repository houses the codebase for an advanced academic research project aimed at revolutionizing supply chain procurement. It transitions traditional, unilateral supplier selection into a **dynamic, bi-directional matching problem** utilizing Multi-Criteria Decision Making (MCDM), Machine Learning (ML), Reinforcement Learning (RL), and Blockchain technologies.
 
-## 1. Overview
+## 1. About
 
 Traditional procurement models assume a one-way evaluation framework wherein the buyer exclusively selects the optimal supplier. However, in constrained or competitive markets, suppliers concurrently prioritize buyers based on payment reliability, order volume, and strategic value. 
 
