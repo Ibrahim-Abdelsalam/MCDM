@@ -6,7 +6,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
+
+try:
+    import seaborn as sns
+except ModuleNotFoundError:
+    sns = None
 
 from ..config import BASE_DIR
 
@@ -19,6 +23,7 @@ class ChartGenerator:
         self.output_dir = output_dir or (BASE_DIR / "data" / "results")
         self.method_colors = {
             "AHP": "#4472C4",
+            "FUZZY_AHP": "#C55A11",
             "TOPSIS": "#375623",
             "VIKOR": "#7030A0",
         }
@@ -29,6 +34,10 @@ class ChartGenerator:
             if key.startswith(method):
                 return method
         return "Unknown"
+
+    def _display_method_name(self, method: str) -> str:
+        """Return a user-facing method label."""
+        return "Fuzzy AHP" if method == "FUZZY_AHP" else method
 
     def generate_top10_charts(
         self,
@@ -66,7 +75,8 @@ class ChartGenerator:
             ax.set_xlabel("Rank", fontsize=12, fontweight="bold")
             ax.set_ylabel("Score", fontsize=12, fontweight="bold")
             ax.set_ylim(0, 1.05)
-            ax.set_title(f"Top 10 {entity_type.title()} - {method} - {key}", fontsize=14, fontweight="bold")
+            method_label = self._display_method_name(method)
+            ax.set_title(f"Top 10 {entity_type.title()} - {method_label} - {key}", fontsize=14, fontweight="bold")
             ax.grid(axis="y", alpha=0.3)
             
             # Save chart
@@ -102,7 +112,11 @@ class ChartGenerator:
             methods_data[method][key] = top_10
         
         # Create one scatter plot per method
-        palette = sns.color_palette("husl", len(methods_data))
+        if sns is not None:
+            palette = sns.color_palette("husl", len(methods_data))
+        else:
+            cmap = plt.get_cmap("tab10")
+            palette = [cmap(i % cmap.N) for i in range(len(methods_data))]
         
         for method_idx, (method, schemes_data) in enumerate(methods_data.items()):
             fig, ax = plt.subplots(figsize=(14, 8))
@@ -131,7 +145,8 @@ class ChartGenerator:
             ax.set_xlabel("Scheme", fontsize=12, fontweight="bold")
             ax.set_ylabel("Score", fontsize=12, fontweight="bold")
             ax.set_ylim(0, 1.05)
-            ax.set_title(f"Cross-Scheme Comparison - {method} - {entity_type.title()}", fontsize=14, fontweight="bold")
+            method_label = self._display_method_name(method)
+            ax.set_title(f"Cross-Scheme Comparison - {method_label} - {entity_type.title()}", fontsize=14, fontweight="bold")
             ax.grid(axis="y", alpha=0.3)
             
             # Save chart

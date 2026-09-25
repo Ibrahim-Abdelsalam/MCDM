@@ -82,15 +82,15 @@ class WeightSchemeManager:
     def _validate_weights(self, entity_type: str, weights_dict: dict[str, Any]) -> None:
         """Validate that the provided weights cover the full criteria set."""
         criteria_names = self._criteria_names(entity_type)
-        if set(weights_dict.keys()) != set(criteria_names):
-            missing = [name for name in criteria_names if name not in weights_dict]
-            extra = [name for name in weights_dict if name not in criteria_names]
-            messages: list[str] = []
-            if missing:
-                messages.append(f"missing criteria: {', '.join(missing)}")
-            if extra:
-                messages.append(f"unexpected criteria: {', '.join(extra)}")
-            raise ValueError("weights_dict must contain exactly one complete criteria set (" + "; ".join(messages) + ").")
+        
+        # Auto-correct missing or extra criteria to prevent crashes with old schemes
+        keys_to_remove = [k for k in weights_dict if k not in criteria_names]
+        for k in keys_to_remove:
+            del weights_dict[k]
+            
+        for name in criteria_names:
+            if name not in weights_dict:
+                weights_dict[name] = 1.0  # Default value for newly added criteria
 
         for criterion_name, weight_value in weights_dict.items():
             if not isinstance(weight_value, (int, float)):

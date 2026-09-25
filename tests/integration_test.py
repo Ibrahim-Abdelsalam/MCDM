@@ -15,6 +15,7 @@ try:
     from app.core.company_manager import CompanyManager
     from app.core.criteria import CriteriaConfig
     from app.core.dataset_generator import DatasetGenerator
+    from app.core.fuzzy_ahp import FuzzyAHPSolver
     from app.core.solver_engine import MCDMSolverEngine
     from app.core.weight_manager import WeightSchemeManager
     from app.export.chart_generator import ChartGenerator
@@ -26,6 +27,7 @@ except ImportError:
     from app.core.company_manager import CompanyManager
     from app.core.criteria import CriteriaConfig
     from app.core.dataset_generator import DatasetGenerator
+    from app.core.fuzzy_ahp import FuzzyAHPSolver
     from app.core.solver_engine import MCDMSolverEngine
     from app.core.weight_manager import WeightSchemeManager
     from app.export.chart_generator import ChartGenerator
@@ -72,14 +74,14 @@ def test_full_workflow() -> None:
     print(f"    ... (9 criteria total)\n")
     
     # ─────────────────────────────────────────────────
-    # Step 3: Run all 3 MCDM methods
+    # Step 3: Run all 4 MCDM methods
     # ─────────────────────────────────────────────────
-    print("[3] Running all 3 MCDM methods...")
+    print("[3] Running all 4 MCDM methods...")
     analysis_results = solver_engine.run_analysis(
         "supplier",
         dataset,
         ["Equal Weights"],
-        ["AHP", "TOPSIS", "VIKOR"],
+        ["AHP", "FUZZY_AHP", "TOPSIS", "VIKOR"],
         v=0.5,
     )
     print("✓ Analysis complete")
@@ -103,7 +105,7 @@ def test_full_workflow() -> None:
     
     # Prepare results in expected format
     export_results = {}
-    for method in ["AHP", "TOPSIS", "VIKOR"]:
+    for method in ["AHP", "FUZZY_AHP", "TOPSIS", "VIKOR"]:
         method_cols = [col for col in analysis_results.columns if method in col]
         if method_cols:
             score_col = [c for c in method_cols if "Score" in c][0]
@@ -134,16 +136,35 @@ def test_full_workflow() -> None:
     print("\nSummary:")
     print(f"  • Generated 50 suppliers with 9 criteria each")
     print(f"  • Created 1 weight scheme (equal weights)")
-    print(f"  • Ran 3 MCDM methods (AHP, TOPSIS, VIKOR)")
+    print(f"  • Ran 4 MCDM methods (AHP, Fuzzy AHP, TOPSIS, VIKOR)")
     print(f"  • Generated 1 Excel workbook with results")
     print(f"  • Generated {len(chart_paths)} visualization charts")
     print(f"\nOutput directory: {BASE_DIR / 'data' / 'results'}")
     print("=" * 60)
 
 
+def test_fuzzy_ahp_solver() -> None:
+    """Validate that Fuzzy AHP produces normalized weights and complete rankings."""
+    criteria_names = CriteriaConfig.get_criteria_names("supplier")
+    weights = {name: 1.0 for name in criteria_names}
+    dataset = DatasetGenerator().generate("supplier", 10, seed=7)
+
+    solver = FuzzyAHPSolver()
+    derived_weights = solver.derive_weights(weights, criteria_names)
+    result = solver.solve(weights, dataset)
+
+    assert set(derived_weights) == set(criteria_names)
+    assert abs(sum(derived_weights.values()) - 1.0) <= 1e-10
+    assert list(result.columns) == ["ID", "FUZZY_AHP_Score", "FUZZY_AHP_Rank"]
+    assert len(result) == len(dataset)
+    assert result["FUZZY_AHP_Score"].between(0.0, 1.0).all()
+    assert result["FUZZY_AHP_Rank"].min() == 1
+
+
 if __name__ == "__main__":
     try:
         test_full_workflow()
+        test_fuzzy_ahp_solver()
     except Exception as e:
         print(f"\n❌ TEST FAILED: {e}")
         import traceback

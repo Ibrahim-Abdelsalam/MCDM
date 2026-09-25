@@ -1,0 +1,20 @@
+{
+  "company_name": "TestFail",
+  "entity_type": "supplier",
+  "gates": {
+    "Quality Compliance": true,
+    "Regulatory and ESG Compliance": false,
+    "Health, Safety, and Environmental (HSE) Standards": true,
+    "Capacity and MOQ Compatibility": true
+  },
+  "scores": {
+    "Delivery Performance": 5,
+    "Cost Competitiveness": 5,
+    "Financial Stability": 5,
+    "Flexibility": 5,
+    "Experience & Track Record": 5,
+    "Technical Capability": 5,
+    "Systems Integration": 5,
+    "Quality Performance": 5
+  }
+}

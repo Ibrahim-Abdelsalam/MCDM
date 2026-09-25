@@ -1,6 +1,6 @@
 # Multi-Criteria Decision Support System (MCDM DSS)
 
-A bidirectional evaluation platform for **Supplier and Buyer Selection** using three proven MCDM methods: **AHP**, **TOPSIS**, and **VIKOR**.
+A bidirectional evaluation platform for **Supplier and Buyer Selection** using four proven MCDM methods: **AHP**, **Fuzzy AHP**, **TOPSIS**, and **VIKOR**.
 
 ## Overview
 
@@ -24,6 +24,7 @@ This system enables organizations to:
 │   ├── dataset_generator.py  # Synthetic data generation
 │   ├── normalizer.py         # Data normalization utilities
 │   ├── ahp.py               # AHP solver
+│   ├── fuzzy_ahp.py         # Fuzzy AHP solver
 │   ├── topsis.py            # TOPSIS solver
 │   ├── vikor.py             # VIKOR solver
 │   └── solver_engine.py     # Analysis orchestrator
@@ -105,7 +106,7 @@ results = engine.run_analysis(
     "supplier",
     dataset,
     ["Equal Weights"],
-    ["AHP", "TOPSIS", "VIKOR"],
+    ["AHP", "FUZZY_AHP", "TOPSIS", "VIKOR"],
     v=0.5
 )
 ```
@@ -140,6 +141,11 @@ results = engine.run_analysis(
 - **Normalization**: Min-max per criterion
 - **Scoring**: Weighted average of normalized scores
 - **Ranking**: Descending by composite score
+
+### Fuzzy AHP (Fuzzy Analytical Hierarchy Process)
+- **Weighting**: Triangular fuzzy numbers with Buckley's geometric mean method
+- **Defuzzification**: Center-of-area crisp weights normalized to sum to 1
+- **Scoring**: Weighted average of normalized scores using defuzzified fuzzy weights
 
 ### TOPSIS (Technique for Order Preference by Similarity to Ideal Solution)
 - **Normalization**: Vector normalization (Euclidean)
@@ -202,7 +208,7 @@ python -m tests.integration_test
 Expected output:
 - ✓ 50 synthetic suppliers generated
 - ✓ Weight scheme created and normalized
-- ✓ All 3 MCDM methods executed
+- ✓ All 4 MCDM methods executed
 - ✓ Excel report generated (11+ KB)
 - ✓ 6 visualization charts produced
 

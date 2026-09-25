@@ -9,15 +9,14 @@ class CriteriaConfig:
     """Store the fixed MCDM criteria for supplier and buyer evaluation."""
 
     SUPPLIER_CRITERIA: ClassVar[dict[str, dict[str, object]]] = {
-        "Quality Performance": {"type": "benefit", "range": [1, 10]},
-        "Delivery Performance": {"type": "benefit", "range": [1, 10]},
-        "Cost Competitiveness": {"type": "cost", "range": [1, 10]},
-        "Financial Stability": {"type": "benefit", "range": [1, 10]},
-        "Technical Capability": {"type": "benefit", "range": [1, 10]},
-        "Compliance & Sustainability": {"type": "benefit", "range": [1, 10]},
-        "Systems Integration": {"type": "benefit", "range": [1, 10]},
-        "Flexibility": {"type": "benefit", "range": [1, 10]},
-        "Experience & Track Record": {"type": "benefit", "range": [1, 10]},
+        "Delivery Performance":        {"type": "benefit", "range": [1, 10]},
+        "Cost Competitiveness":        {"type": "cost",    "range": [1, 10]},
+        "Financial Stability":         {"type": "benefit", "range": [1, 10]},
+        "Flexibility":                 {"type": "benefit", "range": [1, 10]},
+        "Experience & Track Record":   {"type": "benefit", "range": [1, 10]},
+        "Technical Capability":        {"type": "benefit", "range": [1, 10]},
+        "Systems Integration":         {"type": "benefit", "range": [1, 10]},
+        "Quality Performance":         {"type": "benefit", "range": [1, 10]},
     }
 
     BUYER_CRITERIA: ClassVar[dict[str, dict[str, object]]] = {

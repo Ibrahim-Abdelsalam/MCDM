@@ -1,0 +1,1094 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+
+% Core packages
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz-cd}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{adjustbox}
+\usepackage[hidelinks]{hyperref}
+\captionsetup{hypcap=false}
+
+% Paragraphs
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.25\baselineskip}
+\setstretch{1.08}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+\setlist{itemsep=0.15\baselineskip, topsep=0.25\baselineskip, parsep=0pt, partopsep=0pt}
+\emergencystretch=3em
+\hfuzz=15pt
+\hbadness=10000
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {0.85\baselineskip}%
+  {0.25\baselineskip}%
+  {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\definecolor{ejustblue}{HTML}{1F4E79}
+\definecolor{softgray}{HTML}{666666}
+
+\newcommand{\stepheading}[1]{%
+\par\vspace{0.75\baselineskip}%
+\noindent\textbf{#1}\par
+\vspace{0.25\baselineskip}%
+}
+
+\newcommand{\inlinecenterfigure}[3]{%
+\FloatBarrier
+\begin{center}
+\IfFileExists{#1}{%
+\includegraphics[width=0.78\textwidth,height=0.32\textheight,keepaspectratio]{#1}%
+}{%
+\fbox{\parbox[c][0.24\textheight][c]{0.76\textwidth}{\centering Figure file not found: \texttt{\detokenize{#1}}}}%
+}%
+\captionof{figure}{#2}
+\label{#3}
+\end{center}
+\FloatBarrier
+}
+
+\begin{document}
+\pagenumbering{gobble}
+\hypersetup{pageanchor=false}
+
+\begin{titlepage}
+\setlength{\parskip}{0pt}
+\thispagestyle{empty}
+\centering
+
+\vspace*{-0.25cm}
+\includegraphics[width=0.17\textwidth]{logo(2).png}\par
+
+\vspace{0.45cm}
+{\Large\bfseries Egypt-Japan University of Science and Technology\par}
+\vspace{0.15cm}
+{\large Faculty of Engineering\par}
+{\large Department of Industrial Engineering and Systems Management\par}
+
+\vspace{0.65cm}
+{\color{ejustblue}\rule{0.78\textwidth}{1.2pt}\par}
+\vspace{0.22cm}
+{\LARGE\bfseries Graduation Project\par}
+\vspace{0.3cm}{\huge\bfseries An Integrated Fuzzy Approach for Supplier–Buyer Evaluation, Scoring, and Selection\par}
+
+\vspace{0.35cm}
+{\color{ejustblue}\rule{0.78\textwidth}{1.2pt}\par}
+
+\vspace{0.45cm}
+{\large Submitted in partial fulfillment of the requirements for the degree of\par}
+\vspace{0.12cm}
+{\Large\bfseries Bachelor of Science in Industrial Engineering\par}
+
+\vspace{0.55cm}
+
+\begin{minipage}{0.82\textwidth}
+\centering
+{\large\bfseries Submitted by\par}
+\vspace{0.35cm}
+\begin{tabular}{@{}ll@{}}
+Mohamed Abdelhamid Shamly & 120220056 \\
+Ibrahim Magdy Ibrahim Taha Abdelsalam & 120220077 \\
+Mennatollah Safwat Ibraheem Abdelmonaem & 120220357 \\
+\end{tabular}
+\end{minipage}
+
+\vspace{0.5cm}
+
+\begin{minipage}{0.82\textwidth}
+\centering
+{\large\bfseries Supervised by\par}
+\vspace{0.12cm}
+{\Large Prof. Zakaria Yahia\par}
+\end{minipage}
+
+\vspace{0.55cm}
+
+{\large\bfseries Academic Year\par}
+{\Large 2025--2026\par}
+
+\vspace*{-0.15cm}
+\end{titlepage}
+
+\newpage
+\pagenumbering{roman}
+\hypersetup{pageanchor=true}
+\begingroup
+\setlength{\parskip}{0pt}
+\setstretch{1}
+\tableofcontents
+\endgroup
+\newpage
+\pagenumbering{arabic}
+\section{Introduction}
+
+\subsection{Background}
+
+``In the current era, marked by unprecedented technological advances and increasing globalization, efficient supply chain management (SCM) has become a fundamental pillar for the success of companies \cite{ref1}. SCM refers to the management of activities, people, organizations, information, and resources involved in the delivery of a product or service from a supplier to a customer \cite{ref2}. This includes managing relationships between supply chain partners, such as suppliers, logistics service providers, and information technology providers, and customers \cite{ref3}. The core of SCM is to fully understand customer and market needs, maintain partnerships with other stakeholders, and achieve integrated resource sharing \cite{ref4}.
+
+Supply chain disruptions impose substantial and recurring financial losses on industrial firms. A global analysis by McKinsey Global Institute, based on modeling across 23 industry value chains, estimates that companies can expect losses equivalent to almost 42\% of one year's profits over the course of a decade, as shown in Figure~\ref{fig:mckinsey2}, reflecting the combined probability and impact of disruption events \cite{ref6}. These losses are not driven solely by rare catastrophic shocks; firms experience operational disruptions of varying durations with regularity, including events lasting a month or longer occurring approximately every 3.7 years on average, as shown in Figure~\ref{fig:mckinsey-disruption-recurrence} \cite{ref6}. Complementing this macro-level evidence, a Deloitte Global Chief Procurement Officer survey highlights the central role of supplier-related failures in these disruptions: 56\% of firms reported severe supplier disruption or failure, 36\% experienced suppliers failing to meet operational requirements, and 32\% incurred revenue losses due to supply shortages \cite{ref7}. Taken together, these findings indicate that supply chain risk is both structurally embedded and persistently driven by supplier performance, suggesting that the challenge is not merely the occurrence of disruptions, but the effectiveness with which both parties identify and select suitable partners.
+
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.86\textwidth]{Mckinsey Report Figure 2.jpg}
+\caption{Net present value of expected supply chain disruption losses over 10 years, by industry (\% of annual Earnings Before Interest, Taxes, Depreciation, and Amortization (EBITDA)).}
+\label{fig:mckinsey2}
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.86\textwidth]{Mckinsey Report Figure 1.jpg}
+\caption{Expected Frequency interval of supply chain disruptions by event duration.}
+\label{fig:mckinsey-disruption-recurrence}
+\end{figure}
+
+At its mathematical core, buyer-supplier selection is a two-sided matching problem: both parties evaluate one another simultaneously, and a match is only operationally stable when the preferences of both sides are satisfied \cite{ref8}. When only one party's preferences are modeled, the resulting assignment leaves open the possibility that a rejected alternative would have been mutually preferred. Beyond this bilateral dimension, the problem presents three additional structural challenges. First, partner evaluation requires simultaneous assessment across multiple conflicting dimensions -- quality, delivery reliability, financial stability, regulatory compliance, and strategic alignment -- that resist reduction to a single ranking metric \cite{ref9}. Second, a partner's performance profile at the time of selection is not the same as its profile under operational conditions, because performance fluctuates with demand volatility, capacity pressures, and market disruptions \cite{ref10}. Third, evaluation inputs are predominantly derived from expert judgment, which systematic reviews have shown to introduce consistent and measurable bias -- expert-stated priorities regularly diverge from the criteria that drive decisions, creating a gap between perceived and actual partner quality \cite{ref11}. These three dimensions collectively define a problem whose complexity exceeds what current evaluation frameworks were designed to accommodate.
+
+\subsection{Problem Context}
+
+Historically, formal supplier evaluation research emerged in a context of bounded commercial environments, as reflected in Dickson's \cite{ref12} foundational survey of purchasing managers. The criteria that determined an acceptable vendor were manageable through structured expert judgment. The survey identified quality, delivery, and performance history as the dominant selection dimensions. Crucially, the decision was modeled as a unilateral, buyer-driven assessment in which the supplier responded to evaluation rather than conducting one of its own.
+
+A review of 78 supplier selection studies published between 1966 and 2008 \cite{ref9} found that this unilateral framing persisted virtually unchanged across four decades of methodological development, even as the commercial environment shifted. The acceleration of global sourcing from the 1980s onward introduced complexity that progressively invalidated the assumptions underlying these early frameworks. Supplier pools expanded from regionally bounded sets to globally distributed networks spanning multiple regulatory regimes, logistical systems, and operational contexts \cite{ref16}. The criteria relevant to partner evaluation multiplied correspondingly. Assessors were required to look far beyond basic quality and delivery metrics. Modern evaluations must now encompass financial resilience in foreign markets, geopolitical exposure, environmental compliance, and digital integration capability \cite{ref5,ref7}.
+
+More consequentially for evaluation methodology, global supply networks introduced a performance dynamism that static, point-in-time scoring cannot capture: the capability a supplier demonstrates under normal operating conditions diverges systematically from its capability under demand shocks, logistics failures, or capacity constraints \cite{ref10}. Probabilistic modeling of this divergence has shown that static performance scores underestimate actual supply risk by a statistically significant margin, because they fail to represent the distribution of supplier behavior across different operating states \cite{ref15}. A critical review of over two hundred supply chain risk studies found no standardized approach to measuring supplier performance in dynamic environments, identifying this as a persistent methodological gap that existing selection frameworks have not resolved \cite{ref17}.
+
+As buyer-supplier relationships became more competitive, suppliers increasingly exercised selective judgment over their buyer portfolios, prioritizing partners who offer payment reliability, order volume stability, demand predictability, and strategic alignment with their own growth objectives. Empirical evidence confirms that suppliers in such positions allocate preferential resources -- including capacity priority, pricing flexibility, and engineering support -- to buyers they assess as strategically attractive and systematically withhold these advantages from buyers they classify as low-value or high-friction clients \cite{ref14}. This bilateral dynamic is not a peripheral feature of industrial procurement; it is its structural condition. As Gale and Shapley \cite{ref8} established, any assignment process that models only one party's preferences generate outcomes that are unstable in the sense that both parties would, given full information, prefer a different configuration. In procurement terms, a buyer who selects a supplier through a rigorous unilateral evaluation may still receive de-prioritized service, reduced capacity access, and diminished responsiveness if that supplier's own assessment places the buyer in a lower tier -- making the unilateral optimum operationally inferior to a bilateral match that satisfies both sides simultaneously.
+
+Furthermore, the digitization of supply chain operations over the past two decades has made the data integrity dimension of the problem more consequential. Enterprise resource planning systems, electronic procurement platforms, and blockchain-based transaction networks now generate granular, time-stamped records of delivery performance, payment behavior, quality incident rates, and contract compliance -- data that, in principle, provides an objective basis for partner evaluation independent of expert perception. In practice, evaluation processes have continued to rely predominantly on expert-elicited qualitative scores and pairwise judgments \cite{ref10}. The divergence between these two information sources is empirically documented: studies in the automotive sector have shown that Analytic Hierarchy Process (AHP)-based expert assessments of identical suppliers vary substantially across evaluators, with inter-rater consistency ratios indicating that a significant portion of score variance reflects assessor characteristics rather than supplier characteristics \cite{ref13}. The structural consequence is a gap between what procurement records contain and what procurement decisions reflect -- a gap between perceived and actual partner quality that is reproducible, measurable, and causally linked to the mismatches that generate the disruption costs documented at the aggregate level \cite{ref1,ref2}. Research in adjacent supply chain domains has demonstrated that immutable distributed ledger architectures can serve as a trusted data substrate that anchors evaluation inputs to verifiable transactional history, substantially reducing this integrity gap \cite{ref19}.
+
+The convergence of these three developments -- the globalization of supply networks, the emergence of bilateral supplier selectivity, and the digitization of procurement records -- has produced a partner selection environment that differs fundamentally from the one in which the field's dominant analytical frameworks were developed. The problem as it now exists in industrial practice is bilateral in its decision structure, dynamic in its performance characteristics, high-dimensional in its evaluation criteria, and increasingly data-rich in its informational environment. Despite methodological advances that have produced increasingly sophisticated evaluation frameworks, including, most recently, blockchain-integrated multi-criteria optimization models \cite{ref19} and reinforcement learning approaches to adaptive supply chain management \cite{ref18}, a comprehensive approach unifying these elements remains structurally absent.
+
+\subsection{Problem Statement}
+
+This research proposes an integrated intelligent system that addresses four clearly defined weaknesses in current partner-selection frameworks: static evaluation, unverifiable data inputs, absence of learning feedback, and one-sided buyer-driven assessment. Static evaluation means that partner scores are calculated once and remain fixed even when supplier or buyer performance changes, making periodic re-evaluation necessary in dynamic supply networks \cite{ref70}. Unverifiable data inputs mean that decisions rely heavily on expert judgments or historical records whose accuracy and integrity cannot always be confirmed \cite{ref68}. Absence of learning feedback means that previous matching outcomes, disruptions, and relationship performance are not systematically used to improve future decisions, a limitation also noted in supplier selection and order-allocation models that remain deterministic or fixed to a single decision epoch \cite{ref73,ref74}. One-sided buyer-driven assessment means that suppliers are evaluated by buyers, while buyer attractiveness from the supplier's perspective is not modeled with equal importance. The proposed system responds to these weaknesses by providing continuous, data-grounded supplier evaluation; introducing buyer profiling as an equal component of the evaluation architecture; developing an intelligent matching mechanism based on compatibility between buyer and supplier profiles; building a predictive model for supplier performance that accounts for buyer type, since buyer-context differences are often ignored in supplier evaluation models \cite{ref76}; and embedding these components within a secure, distributed data infrastructure that makes inputs verifiable and decisions auditable.
+
+This research aims to address the identified gaps through the following objectives:
+
+\begin{itemize}
+\item To develop a data-driven framework for identifying and structuring buyer and supplier selection criteria using machine learning techniques applied to historical transaction and interaction data.
+\item To design a bi-directional (reciprocal) selection model that captures both buyer-to-supplier and supplier-to-buyer evaluation processes, enabling more balanced and mutually beneficial decision-making.
+\item To integrate and compare multiple Multi-Criteria Decision-Making (MCDM) methods---specifically AHP, Technique for Order Preference by Similarity to Ideal Solution (TOPSIS), and VlseKriterijumska Optimizacija I Kompromisno Resenje (VIKOR)---for criteria weighting and alternative ranking within the proposed framework.
+\item To incorporate machine learning-based models for buyer--supplier evaluation, scoring, and selection, enhancing predictive accuracy and adaptability over time.
+\item To implement the proposed framework within a blockchain-based environment to ensure transparency, trust, data integrity, and secure information sharing among stakeholders.
+\end{itemize}
+
+\newpage
+\section{Literature}
+
+\subsection{Overview}
+
+The concept of supply chain management involves integration of major business processes from the end-users through the original suppliers, involving the movement of materials, information, and money across various business units \cite{ref20}. The supply chain constitutes the facilities and channels of distribution that involve the acquisition, production, assembly, and distribution of goods or services to the customers. Modern day supply chain management extends beyond materials management and embraces concepts such as partnerships, information technology, and total quality management areas such as organizational behavior \cite{ref20}.
+
+Supply chain operations range widely from various interrelated processes, such as procurement, manufacturing planning, inventory control, logistics, distribution, to reverse logistics. Each process comes with its unique management issues but also creates interdependence that makes for the need of coordination in making decisions \cite{ref20}. Modern supply chain management is also complicated by globalization because it adds factors such as foreign exchange fluctuations, political instability, cross-cultural considerations, and longer transport delays \cite{ref21}.
+
+The importance of supply chain management in organizations has changed from being a supportive factor to one that drives the organization towards success. Organizations adopting complete supply chain management activities show increased efficiency and performance. Increased performance is shown through many aspects such as reduced cost of inventory, better quality of products, faster time to market and improved responsiveness to customers' needs \cite{ref21,ref22}.
+
+According to literature, there are six dimensions for supply chain management practices that work together to impact organizational performance, which include strategic supplier partnership, customer relationship, information sharing level, information sharing quality, postponement strategy, and lean practice \cite{ref22}. The mentioned dimensions cover several parts of the supply chain including upstream practices (strategic supplier partnership), information dimension (information sharing level and quality), organization dimension (postponement and lean practice), and downstream practices (customer relationship). It was always proved in research that implementation of supply chain management practices has positive impacts on organizational performance \cite{ref22}.
+
+In this regard, organizational performance measurements may be categorized as financial and non-financial. The financial indicators involve the following aspects: market share, return on investments, return on assets, profitability, and financial solvency. On the other hand, the non-financial performance measures consist of the following operational performance measures: logistics performance, reliability, speed of delivery, flexibility, order fill capabilities, and market performance consisting of market growth, competition, and sales volumes \cite{ref22}.
+
+A digital supply chain is one of the major transformations in the understanding and implementation of supply chain management. Approaches based on electronic data interchange and enterprise resource planning systems are being replaced by digital platforms which utilize big data analytics, cloud computing, Internet of Things, as well as other innovative automation solutions \cite{ref21}. The digital supply chain provides companies with enhanced visibility, collaboration, and agility in their operations.
+
+It can be described as using technologies which can revolutionize traditional approaches to supply chain planning, execution of tasks, collaboration between the parties involved, integration of supply chain components, and creation of new business models \cite{ref21}. Technologies enabling this type of digital transformation include big data analytics, cloud services, unique identification and display technology, robots, sensors and geolocation, as well as nanotechnology with three-dimensional printing capabilities \cite{ref21}.
+
+Advantages that may be derived from digital supply chain management have been identified as including: transparency resulting in superior decision-making; reduction of inventory through effective just-in-time purchasing; inventory level visibility at all integrated processes along the value chain; faster deliveries owing to fewer stages along the selling chain; better appreciation of customers' demands due to demand sensing and current sales figures; increased sales and profits; better flexibility of the supply chain; and lower risks and costs \cite{ref21}.
+
+Supply chain management practices impact organizational performance, which in turn influences the results in terms of customer satisfaction and customer loyalty. The impact can be seen through many different mechanisms, for instance through improvement of product quality and delivery through strategic supplier partnership, information exchange as a means of meeting customer needs in a more effective way and lean practices aimed at decreasing the amounts of waste and improving responsiveness to customer needs \cite{ref22}. Companies that perform best in terms of supply chain management practices have an ability to offer consistently high-quality products and reliable deliveries.
+
+In accordance with the research findings, supply chain management practices, such as strategic supplier partnership, customer relationship, information sharing, quality of information sharing, postponement and lean practices, contribute to the improvements in organizational performance based on financial indicators as well as other organizational measures, thus leading to customer satisfaction and customer loyalty outcomes \cite{ref22}. Customer satisfaction is considered the key factor that influences customer loyalty, as it mainly depends on quality delivered by companies. In case of customer dissatisfaction, consumers choose competitors' products and services, which results in customers' retention challenges for organizations.
+
+\subsection{Supplier Evaluation}
+
+\subsubsection{Importance of Supplier Selection}
+
+It has long been known that the supplier selection process is one of the most important steps in supply chain management with serious effects on competitive ability and performance of organizations. This is due to the high percentage of product costs linked to purchased goods that could be as high as seventy percent \cite{ref23}. Therefore, supplier selection is not a matter of comparing prices; it is something much more than that.
+
+The inefficient process of supplier selection leads to losses of money and may even bring losses for a company, while poor supplier choices can cascade across the supply chain through quality problems, delays, and shortages \cite{ref23,ref67}. The appropriate purchasing strategy and appropriate suppliers may become very important for the management of successful companies, and it is beneficial for such companies to make appropriate decisions in the matter of supplier selection \cite{ref23}. Undoubtedly, supplier selection is recognized as a multicriteria decision-making task in the literature \cite{ref24,ref25}.
+
+
+
+In earlier studies on supplier selection, criteria that were considered included traditional performance measures such as cost, quality, and delivery dependability \cite{ref13}. Current supplier selection methods have been developed to include other aspects such as technology, production capacity, financial viability, environmental performance, and social responsibility \cite{ref26,ref27}. A review of literature on supplier selection demonstrates over one hundred and fifty different criteria for supplier evaluation although a few critical criteria are consistently favored in practice \cite{ref28}.
+
+The increase in number of criteria utilized in supplier evaluation is linked to the broadening scope of duties in supply chain management and heightened expectations from stakeholders regarding sustainability and corporate social responsibility. Traditional criteria still apply although there is a need for incorporation of new criteria such as environment criteria, which includes environmental management, green design capabilities, waste management, and pollution prevention as well as social criteria.
+
+\subsubsection{Most Critical Supplier Selection Criteria}
+
+Consistent trends in terms of the importance of criteria were found during empirical studies carried out in different industrial environments. Quality always is the most significant criterion, followed by compliance with the delivery schedule and cost considerations \cite{ref26,ref28}. Empirical studies carried out in the Indian manufacturing industry revealed seven criteria having critical importance for different procurement processes: quality of product, delivery compliance, price, technological capability, production capability, financial stability, and electronic transaction capability \cite{ref26}.
+
+These criteria were prioritized based on research results. The most significant was the quality of product with the weight of about twenty-six percent, delivery compliance (twenty percent), and price (fifteen percent). Both technological capability and production capability had weight of about eleven percent, financial stability -- ten percent, and electronic transaction capability -- six and a half percent \cite{ref26}.
+
+At that, the significance of particular criteria can vary depending on the industrial environment. Rapidly changing industry places much stress on innovative capabilities of suppliers. Stable industry focuses on cost and reliability. Besides, the significance of the criterion of electronic transaction capability grows steadily due to the increased use of electronic procurement systems \cite{ref26}.
+
+\subsubsection{Sustainability in Supplier Evaluation}
+
+Sustainability issues in supplier evaluation constitute another important contemporary development. There is growing realization on the part of organizations that the performance of suppliers on environment and social issues directly influences their own sustainability performances and reputations \cite{ref27,ref29}. Sustainability-based supplier selection models broaden the evaluation scope to include such factors as environmental management system, green design capability, waste management capability, occupational health and safety management system, and social responsibility \cite{ref27,ref30}.
+
+A study carried out in the Indian automotive industry revealed that five most important sustainable supplier selection criteria were environmental cost, product quality, price, occupational health and safety management system, and environmental competency. The priority weight of the environmental dimension was about forty-four percent; the priority weights of the economic and social dimensions were thirty-nine and seventeen percent respectively \cite{ref27}.
+
+Environmental costs constituted the most important criterion within the environmental dimension; other criteria included environmental competencies, environmental management systems, green research and development, green innovation, waste management and pollution prevention, green management, green manufacturing, green packaging and labeling, and green design and purchasing \cite{ref27}.
+
+\subsubsection{Industry-Specific Applications in Supplier Evaluation}
+
+The automobile industry has proved to be especially promising in developing more effective supplier selection techniques because of its intricate supply chain and high standards. Various multi-criteria decision-making methods, such as AHP--TOPSIS integration, fuzzy Decision-Making Trial and Evaluation Laboratory--Analytic Network Process--TOPSIS (DEMATEL--ANP--TOPSIS) combination, and AHP--VIKOR approaches, were used in the analysis of supplier selection in automobile contexts \cite{ref13,ref27,ref31}. The study carried out in one of India's top automobile manufacturers used fuzzy AHP to assess criteria weights and TOPSIS to rank potential suppliers of headlamps, thus generating valuable recommendations for the company \cite{ref25}. In total, eight criteria, such as quality of product, cost of product, quality of relationship, capacity of manufacture, warranty, punctuality of delivery, environmental performance and name of brand, were considered. Product quality was assigned the greatest weight, which amounted to twenty-four percent, while the other two criteria -- cost and punctuality of delivery -- got second and third position, respectively \cite{ref25}. Also, research within the Pakistani automobile industry demonstrated that applying AHP for ranking the main criteria resulted in price being allocated forty-seven percent weight, quality twenty-eight percent, delivery sixteen percent, and service ten percent \cite{ref13}.
+
+
+
+Matching the evaluation criteria with the buyer-supplier integration strategies becomes a sophisticated issue for criteria generation. The matching is because at different integration levels there arise different criteria \cite{ref31}. A five-step buyer-supplier integration process has been suggested by the researchers, which includes traditional relationships, logistics partnerships, operational partnerships, strategic alliances, and sustainable collaborations \cite{ref30}.
+
+At the beginning stages of integration when criteria are generated to evaluate buyers' and suppliers' relationship, those criteria concentrate on price, quality, and delivery performance only. However, as integration progresses further, criteria multiply greatly. For example, there could be about eighteen criteria considered at the traditional relationship level, but more than one hundred twenty criteria at the sustainable collaboration level involving economics, environment, society, technology, and strategies \cite{ref30}.
+
+\subsubsection{Supplier Evaluation Criteria Development Process}
+
+Criteria development procedures usually include thorough reviews of literature after which experts validate results from the study through Delphi techniques \cite{ref26,ref28}. In developing an instrument used to measure supplier evaluation criteria and its benefits within the Indian automobile industry, the author adopted a systematic process. It involved the identification of criteria using literature search resulting in more than one hundred and fifty criteria, reduction to twenty-five criteria by pre-questionnaire evaluation by experts, and then validation using survey procedures \cite{ref28}. Reliability of the instruments developed is measured using statistical techniques like Cronbach's alpha. Values above 0.7 are normally considered reliable \cite{ref28}. The content validity of an instrument can be proved systematically through expert evaluation, whereas criterion validity is measured using several multiple correlation coefficients \cite{ref28}. The systematic procedure guarantees a well-rounded and relevant criteria set in each research study.
+
+
+\subsection{Buyer Evaluation}
+
+Buyer evaluation refers to the supplier-side assessment of whether a buyer is desirable, reliable, and strategically valuable as a business partner. In a reciprocal supplier--buyer selection problem, this perspective is essential because suppliers do not allocate capacity, technical support, flexibility, or innovation effort equally to all customers. Instead, suppliers tend to prioritize buyers who offer stable demand, reliable payment, collaborative behavior, strategic growth potential, and low relational friction. Therefore, buyer evaluation in this study is framed through the concept of customer attractiveness, which explains how suppliers judge buyers before granting them preferred access to resources.
+
+\subsubsection{Customer Attractiveness as a Supplier-Side Evaluation Construct}
+
+Although much has been written in relation to evaluating and selecting suppliers from the buyer's perspective, the opposite approach -- evaluating and selecting customers from the supplier's perspective -- has been less researched. However, recent years have seen increasing awareness of the strategic importance of achieving preferential status with key suppliers in competitive input markets \cite{ref32}. Customer attractiveness describes how professionally desirable a buyer appears to suppliers and whether that buyer deserves preferential treatment in resource allocation \cite{ref32,ref33}. This concept is grounded in social exchange theory, where voluntary exchange occurs because both parties expect benefits from the relationship \cite{ref33,ref34}. In this study, customer attractiveness is used as the conceptual foundation for buyer evaluation because it converts the supplier's view of the buyer into assessable criteria.
+
+
+
+Customer attractiveness consists of three interrelated components: expected value, trust, and dependence \cite{ref33}. Expected value includes direct economic gains, such as sales volume, profitability, and growth opportunities, as well as indirect gains such as learning, reference value, market access, and competence development. From the supplier's perspective, price and volume factors, growth possibilities, access to new buyers and suppliers, and competency development all contribute to the expected value of serving a buyer \cite{ref33}.
+
+Trust strengthens the attractiveness generated by expected value. It includes benevolence trust, which reflects the buyer's willingness to support the supplier beyond narrow self-interest, and integrity trust, which reflects fairness, reliability, shared values, and adherence to accepted principles \cite{ref33}. Dependence also affects attractiveness: a buyer can become more attractive when the relationship creates valuable mutual commitment, but excessive or asymmetric dependence may create concerns about opportunism. Dependence is shaped by association value, availability of alternative partners, and transaction-specific resources \cite{ref33}.
+
+
+
+Systematic investigations show that customer attractiveness can be operationalized through multiple dimensions relevant to supplier decision-making \cite{ref32}. Market-growth factors include the buyer's size, market share, growth rate, and market influence. Economic factors include margins, price and volume considerations, payment reliability, and value creation. Technological factors include the buyer's innovation capability, technical maturity, knowledge-transfer potential, and willingness to involve suppliers early in development. Social and relational factors include communication quality, familiarity, similarity, compatibility, and the possibility of close personal interaction. Risk-related factors include demand stability, risk sharing, standardization, dependence, and protection of supplier know-how \cite{ref32}. These dimensions align directly with the buyer-side criteria used later in the proposed framework.
+
+
+
+Customer attractiveness becomes operationally important when it leads to preferred customer status. A preferred customer is a buyer to whom the supplier allocates greater resources than to less preferred customers because the supplier values the buyer's behavior, business philosophy, and relationship potential \cite{ref14}. The benefits of preferred status include priority access to scarce materials, earlier access to new technology, more flexible delivery scheduling, better pricing, and greater willingness to collaborate in innovation \cite{ref32}. Empirical studies also show that customer attractiveness affects preferential resource allocation and that this effect is mediated by supplier satisfaction, meaning that buyers must not only appear attractive before the relationship but also perform satisfactorily during the relationship \cite{ref14}.
+
+\subsubsection{Reciprocal Dynamics in Buyer--Supplier Relationships}
+
+The interaction between buyer attractiveness and supplier attractiveness generates reciprocal dynamics in relationship development. Studies of buyer--supplier relationships in high-tech industries show that preferential treatment emerges when both parties perceive value in the relationship and when their expectations are reinforced through actual performance \cite{ref14,ref32}. This makes buyer evaluation more than a secondary extension of supplier evaluation; it is a necessary component of stable matching. A supplier that evaluates the buyer negatively may withhold priority capacity, flexibility, or innovation support even when the buyer's supplier-ranking model indicates a technically optimal match. For this reason, the proposed framework treats buyer evaluation as a supplier-side assessment of customer attractiveness rather than as a generic mirror image of supplier evaluation.
+
+\subsection{Multi-Criteria Decision Making (MCDM)}
+
+Multi-Criteria Decision-Making (MCDM) methods provide structured tools for evaluating alternatives when decisions depend on several conflicting criteria. In supplier--buyer selection, TOPSIS, VIKOR, AHP, fuzzy AHP, and DEMATEL are often mentioned together, but they should not be treated as interchangeable methods with the same function. AHP and fuzzy AHP are mainly used to structure the decision problem and derive subjective criteria weights; DEMATEL is used to identify causal relationships and interdependencies among criteria; and TOPSIS and VIKOR are mainly used to rank alternatives after criteria weights and performance scores are available. For this reason, the following review first discusses the main MCDM techniques and then explains criteria weighting as a cross-cutting methodological step that supports, rather than competes with, the ranking methods.
+
+\subsubsection{Analytic Hierarchy Process (AHP)}
+
+Analytic Hierarchy Process, proposed by Saaty, is considered one of the most used multicriteria decision making models in supplier selection problems. The key strength of the process is its capacity to break down a complex decision problem into a hierarchy involving goals, criteria, sub criteria, and alternative actions to effectively evaluate both quantitative and qualitative elements \cite{ref13}. The process utilizes a pair wise comparison approach to prioritize the weights by asking the decision makers to compare the importance of the factors on a one to nine scale where one indicates equal importance and nine indicates extremely more important. There is an integrated procedure to check the inconsistency of judgments which is acceptable when the consistency ratio is equal to or below 0.10 \cite{ref13}; however, pairwise comparisons may still produce inconsistent or contradictory judgments in practice \cite{ref71}. AHP has been widely used in various sectors in supplier selection problems.
+
+\subsubsection{Fuzzy AHP (FAHP)}
+
+The fuzzy AHP method is an improved version of the classical AHP method, which suffers from the drawback of failing to consider the intrinsic uncertainty of human assessments in making decisions. In fuzzy AHP, rather than using crisp numbers for comparison, fuzzy numbers are used, especially triangular fuzzy numbers to reflect the uncertainty of linguistic assessments like moderately important and strongly preferred \cite{ref25,ref69}. Triangular fuzzy numbers are characterized by three parameters that represent their minimum, most likely value and maximum. Fuzzy AHP methods have been developed by many researchers and Chang's extent analysis model stands out in supplier selection cases \cite{ref35}. Fuzzy AHP allows for expressing of the decision makers' preferences in a natural manner despite rigorous mathematical calculations.
+
+Studies show that the results of fuzzy AHP and classical AHP can be quite similar when judgments are consistent; but when there is much uncertainty, fuzzy AHP shows added robustness \cite{ref35}. Fuzzy AHP has also proved successful in application areas such as the production of gear motors, steel manufacture, and automotive supplier selection \cite{ref25}.
+
+\subsubsection{TOPSIS Method}
+
+Technique for Order Preference by Similarity to Ideal Solution is based on the assumption that the ideal choice is an alternative that simultaneously minimizes its distance from the positive ideal solution consisting of the best possible levels of all criteria and maximizes its distance from the negative ideal solution of the worst possible levels of all criteria \cite{ref31,ref32}. TOPSIS uses an algorithmic approach which includes construction of a normalized decision matrix, evaluation of the weighted normalized decision matrix, calculation of positive and negative ideal solutions, separation measures calculation, relative closeness calculation, and alternative ranking by decreasing closeness level \cite{ref32}. There are fuzzy versions of TOPSIS in which linguistic variables and fuzzy numbers are used to deal with uncertainty in assessments.
+
+\subsubsection{VIKOR Method}
+
+VIKOR stands for VlseKriterijumska Optimizacija I Kompromisno Resenje, which is concerned with the prioritization of the available options based on conflicting criteria, using a method of compromise programming to obtain a solution that reflects the maximum group utility and minimum individual regret \cite{ref27,ref33}. As opposed to TOPSIS, whose core concept is based on the proximity to ideal options, VIKOR considers decision-makers' preferences related to the trade-off between group utility and individual regret through an adjustable parameter \cite{ref33}. The combination of VIKOR with AHP has proved successful within sustainable supplier selection, where AHP finds the weights of criteria and VIKOR ranks supplier options. VIKOR--AHP combines advantages of both approaches: the precise weight determination of AHP and the generation of acceptable compromise solutions by VIKOR.
+
+\subsubsection{DEMATEL Method}
+
+The DEMATEL approach focuses on addressing the specific problem of identifying and mapping causal relations between the criteria used for evaluation. Contrary to AHP and TOPSIS that assume independence among criteria, DEMATEL models the inherent dependencies and feedback mechanisms existing in the real-world decision-making scenario \cite{ref24,ref31}. Total relation matrices are formed using the DEMATEL approach to quantify the direct and indirect relationships between the criteria and construct causal maps indicating the causes and effects among the criteria used. The process helps to identify the cause group and the effect group criteria \cite{ref31} which are useful for subsequent application of the Analytic Network Process. Decision-Making Trial and Evaluation Laboratory--Analytic Network Process--Technique for Order Preference by Similarity to Ideal Solution (DEMATEL--ANP--TOPSIS) approaches have been successfully employed for automotive supplier selection applications \cite{ref31}.
+
+\subsubsection{Comparative Performance of MCDM Methods}
+
+Comparative studies between fuzzy AHP and fuzzy TOPSIS within the context of supplier selection demonstrate that each methodology has certain unique features which could be very helpful in practice \cite{ref35}. Specifically, from a number of studies focused on comparing fuzzy AHP and fuzzy TOPSIS methodologies for solving problems in the area of supplier selection, one may conclude that although both techniques are very efficient in handling group decisions under uncertainty conditions, fuzzy TOPSIS technique proves more successful in terms of flexibility and computational complexity in case of large-scale alternatives and criteria sets.
+
+Moreover, fuzzy TOPSIS method is highly flexible and resistant to any changes in the set of alternatives or criteria being used since it does not produce ranking reversal effect in case of alternative additions or deletions. In other words, such feature could prove useful especially if a problem under consideration relates to a dynamically changing market with constantly growing or shrinking number of possible suppliers or criteria \cite{ref35}. On the other hand, if a company aims at replacing an existing supplier and thus requires comparisons between its performance and those of other companies, it would be better to use fuzzy AHP.
+
+\subsection{Integrated Supplier-Buyer Evaluation Framework: Current State and Gaps}
+
+\subsubsection{Current Research Fragmentation}
+
+The above review indicates that there are three rather unconnected streams of research studies within the larger body of literature related to buyer-supplier evaluations. First, supplier evaluation research has made extensive use of multi-criteria decision-making techniques for solving the supplier selection problem in various business domains. Second, buyer attractiveness research has evolved into an independent stream analyzing how suppliers perceive buyers. Third, methodology development research has developed multi-criteria decision-making approaches independently of applications \cite{ref22,ref32,ref35}.
+
+It results in various theoretical and practical problems. Theoretically, it hides the intrinsically dyadic and reciprocal nature of buyer-supplier relationships, whereby each party's perception of the other affects their behavior and actions, which determine the result of the relationship. Practically, it prevents from developing decision support systems capable of helping organizations to consider buyer attractiveness in the process of supplier selection at once \cite{ref34,ref14}.
+
+\subsubsection{Theoretical Foundation for Integration}
+
+In this context, social exchange theory gives us a cohesive approach to understand the phenomenon of supplier selection as well as customer attractiveness \cite{ref33,ref34}. Social exchange theory helps us to see the process of supplier selection and customer attractiveness as complementary processes of the same social exchange phenomenon. Buyers will choose suppliers according to the expected value of the relationship while considering issues of trust and dependence. At the same time, suppliers will also consider expected value, trust and dependence while choosing their customers \cite{ref14}. In an integrated approach, both types of evaluations are incorporated into a model which makes possible the study of compatibility or incompatibility of both perspectives. The use of both subjective and objective approaches will make our evaluation process more reliable and robust \cite{ref36}. Sensitivity analysis will make possible the analysis of robustness of our results.
+
+
+
+An integrated evaluation framework should include evaluation criteria from supplier selection literature based on traditional, environmental, and social perspectives, along with customer attractiveness criteria in terms of value, trust, and dependence dimensions \cite{ref22,ref32}. Such a framework will require validation using Delphi method in industry-specific context to enhance relevance. Regarding the determination of weights, the integrated framework should consider the utilization of AHP or fuzzy AHP methods for subjective weights, the application of entropy technique for objective weights, as well as combined weighting of objective and subjective weights for the final set of weights \cite{ref36}. The causal analysis through DEMATEL can be used to establish interdependencies among the criteria and determine network structure \cite{ref24,ref31}. The evaluation and ranking process should consider the use of TOPSIS or VIKOR technique in determining the rankings of alternatives, where both buyer and supplier evaluations of each alternative should be carried out in parallel to compare the results and determine the degree of convergence/difference between these evaluations \cite{ref27,ref31}.
+
+
+An integrated model of supplier-buyer evaluation becomes necessary for various reasons. Theoretically, it reflects the process of reciprocal social exchange that lacks in a one-way approach and creates an adequate model of phenomena under consideration \cite{ref33,ref14}. On the practical side, firms are forced to evaluate their suppliers and customers at once due to the competitive nature of factor markets, where preferential access to supplier resources is seen as a competitive advantage for any company \cite{ref32,ref34}. Methodologically, this framework includes a combination of two complementary approaches to solving MCDM problems by taking advantages of AHP in weight determination, DEMATEL in causal relationships identification, and either TOPSIS or VIKOR in alternatives ranking \cite{ref35,ref36}. Furthermore, the model allows for customization to accommodate different industries and sectors using appropriate criteria and methods for each case \cite{ref30,ref35}. Finally, this model covers such modern aspects as environmental and social components in decision making \cite{ref27,ref29}.
+
+\subsubsection{Implementation Approach}
+
+Implementation of the proposed integrated model should be done in several stages. The first stage should include identification of the comprehensive set of criteria, using the available supplier selection criteria literature, and customer attractiveness criteria literature. Delphi techniques can be used at this stage to validate and refine selected criteria sets.
+
+The next stage should involve application of the multi-criteria decision-making methods to obtain the criteria weights and perform parallel assessment of alternatives from the buyer perspective as well as supplier perspective. In the third stage, those parallel assessment results will be combined, resulting in selection of suppliers that satisfy buyer criteria while seeing the buyer company as their attractive customer---a combination that will probably lead to better relationships \cite{ref14}.
+
+This last stage should include also mechanisms of continuous monitoring and periodic re-evaluation of the selected criteria. Development of such an integrated model will contribute to both academic research into buyer-seller reciprocal interactions and practical decision making in customer attractiveness and supplier selection.
+
+\subsection{Machine Learning Integration in Supplier-Buyer Problem}
+
+There has been an immense increase in the amount of research on Machine Learning (ML) and decision support systems concerning supplier selection and evaluation due to the complexity involved in SCM during the Industry 4.0 era. \cite{ref37} performed a comprehensive review on quantitative decision models for supplier selection in the industry 4.0 era and assessed fourteen papers written from 2017 to 2020. It was found out that majority of decision models incorporated MCDM methods and artificial intelligence with the use of fuzzy logic to accommodate uncertainty. Common Industry 4.0 criteria included information sharing, technology capabilities, digital collaboration, and engagement. Industries where real-world applications were done include the automotive, aviation, and textile industries. Sensitivity analysis and comparison methods were used by half of the analyzed studies to authenticate findings. There have been some gaps identified in the study which include the lack of use of deep learning, stochastic methods, and hybridization of lean/agile and digital SCM, gaps which have since been addressed in recent literature \cite{ref37}.
+
+\subsubsection{Pure Machine Learning Approaches}
+
+\paragraph{Unsupervised Clustering for Supplier Segmentation}
+
+Various clustering techniques have been used in segmentation of suppliers. \cite{ref40} used K-Means, Hierarchical K-Means, Agglomerative Nesting (AGNES), and Fuzzy Clustering to perform supplier segmentation in an application study using actual data from the aeronautics sector under the Cross-Industry Standard Process for Data Mining (CRISP--DM) paradigm. The efficiency of various methods was calculated using performance metrics such as Average Proportion of Non-overlap (APN), Average Distance (AD), Average Distance between Means (ADM), and Figure of Merit (FOM); the results revealed that K-Means outperformed other algorithms. As a result, implementation of K-Means yielded savings of 7\% on the qualification process costs and 10\% lower management overhead. It also provided a decision-making support system based on data analytics. Based on this research, \cite{ref39} proposed a two-stage approach for supplier selection and order allocation problem. In stage one, clustering techniques such as K-Means, Gaussian Mixture Model, and Balanced Iterative Reducing and Clustering using Hierarchies (BIRCH) were used to segment a large number of suppliers through an analysis of data from Canadian Public Works and Government Services' actual contract. In stage two, a mathematical model based on a multi-objective mixed-integer linear programming using seven parameters, including total cost, percentage of defects, timeliness, and recency, was applied across all the products and time periods. Among all the clustering algorithms, K-Means achieved best Silhouette scores in all the categories.
+
+\paragraph{Supervised Classification for Criteria Identification}
+
+Considering a complementary classification approach, \cite{ref38} presented a decision support system based on machine learning with the use of a random forest method. The method was used for classifying the criteria rather than the suppliers. Through this method, it became possible to rank criteria based on their discriminative properties.
+
+\subsubsection{Hybrid MCDM--Machine Learning Frameworks}
+
+\paragraph{MCDM-Enhanced Classification and Ranking}
+
+
+\cite{ref42a} proposed a sustainable supplier selection methodology for the pharmaceutical industry through the combination of Non-Negative Matrix Factorization (NMF), Random Forest (RF), and TOPSIS. First, NMF method was applied to transform twenty-four criteria into eight main dimensions in order to lower complexity. To calculate weights for the criteria, a pipeline of different classifiers (Random Forest, Support Vector Classifier, K-Nearest Neighbors, Logistic Regression) was employed to extract feature importance, Random Forest being the classifier with the highest accuracy (84.3\%). Related integrated machine-learning and MCDM approaches, such as ML--MARCOS frameworks, similarly show the role of predictive analytics in supplier evaluation \cite{ref72}. As a result, TOPSIS algorithm yielded rankings where three most important criteria were defined as technical capability, management competence, and product reliability. In \cite{ref43}, the use of decision tree in conjunction with AHP to simplify decisions and rank candidate suppliers was suggested. This framework has been validated on several real-life case studies from oil and gas and aerospace manufacturing sectors and provided results competitive to the machine learning classifiers while maintaining transparency of the whole process.
+Addressing sustainability and circular economy dimensions, \cite{ref44} used a combination of the Lexicographic Goal ProgrammingBased Stochastic BestWorst Method and a Sample-Weighted Support Vector Machine (SWSVM) to build a comprehensive evaluation system covering 30 subcriteria across sustainability, agility, resilience, and digitalization, with validation in the automotive industry. Furthering the integration of ML with MCDM, \cite{ref41} introduced a framework that addresses a key limitation of traditional MCDM methods: their reliance on subjective expert judgment for weighting criteria. By combining four machine learning algorithms: Random Forest, Decision Tree, Linear Regression, and Gradient Boosting, with the Measurement of Alternatives and Ranking according to Compromise Solution (MARCOS) method, the study derives objective criteria weights from data, resulting in a more systematic and less biasprone supplier evaluation and selection process.
+\paragraph{MCDM-Integrated Predictive Regression}
+\cite{ref46a} proposed a probabilistic machine learning approach that integrates flexible, resilient, circular economy, and Industry 4.0 considerations to evaluate suppliers in the home appliance sector. A scenariobased Stochastic VIKOR method is used to assess supplier performance under uncertainty, while an Artificial Neural Network--Genetic Algorithm (ANNG) achieves a prediction accuracy of 98\%, outperforming other machine learning models tested. This represents a direct combination of an MCDM method (Stochastic VIKOR) with a predictive Artificial Neural Network Genetic Algorithm (ANNGA) model.
+\subsection{Decentralized Technologies}
+The incorporation of blockchain technology in supply chain management has evolved over the last decade from being an innovative proposition to a research field of substantial depth. Systematic analysis of the literature shows that the use of blockchain has experienced rapid growth in supply chain settings ranging from healthcare, foods, automobile, and electronics to international logistics \cite{ref54,ref59}. Wang et al. \cite{ref54} undertook a systematic review of research on blockchain in supply chains and found that the key themes of blockchain-based applications include traceability, partner trust, data integrity, and compliance automation, and emphasized the need for a framework to facilitate its integration with decision-making and partner assessment processes. Pournader et al. \cite{ref59}, who reviewed 178 papers on blockchain in supply chains, logistics, and transportation, confirmed that there has been significant growth in the number of theoretically and empirically sound studies since 2017, showing a transition from general adoption to domain-specific integration issues. Overall, the systematic analysis of the literature shows that blockchain-based research in supply chain management has developed sufficiently in empirical breadth to be applied specifically to the supplier-buyer pairing problem studied in this paper.
+
+\subsubsection{Blockchain Capabilities, Adoption, and Strategic Rationale in Supply Chains}
+
+The earliest and most researched application of blockchain in the supply chain context relates to traceability, i.e., the capability to create a tamper-resistant and chronological sequence of transactions, movements, and performance-related events through the entire supply chain network. As pointed out by Francisco \& Swanson \cite{ref52}, in their examination of blockchain adoption in supply chains from an organizational perspective, blockchain's inherent potential to provide both parties with a shared and immutable history of inter-organizational interactions alters the trade-off associated with trust, eliminating the costs associated with expensive bilateral audits and independent verification of trading partners' claims. In turn, their research demonstrates that adoption of blockchain technology faces the barrier related to organizations being unwilling to provide information on their performance if they do not have control over which third party will be observing it, which is the key motivation for using permissioned rather than public blockchains in procurement environments. The work of Kshetri \cite{ref53} complements this by mapping blockchain capabilities against SCM objectives, noting that while blockchain-based systems can contribute to numerous processes and outcomes, only data integrity, process compliance monitoring, and counterfeiting protection are likely to see tangible improvements in a consistent manner. The application of this approach to the phenomenon of supply chain resilience was carried out by Min \cite{ref58}, who demonstrated how the capability of blockchain to enable the provision of up-to-date information regarding the suppliers' performance in situations when there are issues like delayed shipments, reduced capacity, and quality problems ensures better partnership management than the periodic reports provided by traditional procurement systems. Thus, taking into consideration all three approaches, one can conclude that blockchain is changing the way the information context is managed in SCM.
+
+Alongside the functional rationale behind blockchain in supply chains, there has been another strand of literature focused on understanding the conditions under which such an innovation would be adopted by businesses as well as on its impact on strategic interactions between buyers and suppliers. For instance, Queiroz \& Wamba \cite{ref56} have empirically investigated the key drivers of blockchain adoption among firms located in India and the United States, demonstrating that top management support, organizational readiness, and competition were the most important determinants of adoption, while regulatory uncertainty and interoperability concerns were identified as the key obstacles. It is especially noteworthy that their finding indicating that the main driver behind blockchain adoption was the fear of losing to competitors rather than any proactive value creation efforts is relevant for the area of procurement, suggesting that the process of adopting blockchain as part of supply chain partners' selection will become increasingly common with more firms relying on such a practice for the designation of favored suppliers. Similarly, Schmidt \& Wagner \cite{ref57} applied a transaction cost perspective to the same question, analyzing the impact of blockchain technology on buyer-supplier relationships. The implication of their reasoning for evaluative approaches is direct: because blockchain precludes information manipulation, scores obtained from expert opinion or supplier self-assessment become substantially more reliable, narrowing the gap between actual and perceived partner performance that systematic reviews of conventional procurement practice have documented. 
+
+
+This last point connects adoption-level research to the evaluation problem addressed in this study. According to Chang et al. \cite{ref60}, blockchain applications in global logistics and international trade reveal a clear pattern where the actual variation in partner performance measured through distributed ledger always exceeds that estimated based on baseline evaluations of partner -- thus confirming the richness of data provided by blockchain as well as revealing a deficiency of static scoring as a measure of partner's operation. Wamba and Queiroz \cite{ref66}  subsequently identified partner credibility assessment and performance-based contract implementation as two top priorities for future development of blockchain applications in operations management. Taken together, these findings establish the empirical and strategic rationale for moving from blockchain as a general-purpose trust and traceability mechanism toward blockchain as an input to supplier and buyer evaluation specifically, which is the focus of the following subsection.
+
+\subsubsection{Blockchain-Enabled Supplier Evaluation}
+
+One of the biggest limitations associated with traditional approaches to supplier assessment lies in their use of expert opinion-based subjective ratings and subjective performance reporting, both of which have been found by systematic literature reviews to be sources of bias in the supplier selection process. The problem of bias can be mitigated with the application of blockchain technology, thanks to its immutable nature, which provides the possibility to anchor assessments in actual historical transactions. This approach was proven by Abbas et al. \cite{ref19}, who applied a blockchain solution based on Hyperledger Fabric in a pharmaceutical supply chain environment and proved that the immutable blockchain ledger helps to mitigate the discrepancy between perception and objective recording of the supplier performance. In the proposed architecture, a Representational State Transfer Application Programming Interface (REST API) was used to divide the data collection and analysis tasks, placing blockchain at the former and machine learning models at the latter. Not only did the result include increased data accuracy; it involved a change in the fundamental architecture of the evaluation system since any performance data entry is related to an actual transaction that cannot be unilaterally manipulated after the fact by anyone party to it. The findings by Park \& Li \cite{ref65}, conducted via a systematic analysis of cases, were that blockchain's use as a decentralized ledger system resulted in an improvement in sustainability performance results and trust between organizations within the buyer-seller dynamic. This research was performed to show how data transparency plays a critical role in this phenomenon; specifically, how blockchain-based data improves performance outcomes while reducing evaluation bias.
+
+A related but distinct development in this literature is the shift from treating blockchain solely as a supporting instrument in the evaluation process to treating suppliers' blockchain readiness and maturity as an evaluation criterion in its own right. This line of thought was pioneered by Saberi et al. \cite{ref55}, who have conducted thorough analyses of the distinguishing features of blockchain -- decentralization, immutable nature of records, automatic processes performed using smart contracts, and consensus validation of transactions. In considering these aspects of blockchain in combination with sustainable supply chains, it becomes obvious that its implementation will bring maximum value when assessing suppliers. The next logical step was recognizing the importance of evaluating suppliers' blockchain readiness and digital maturity, because, if such elements really have any impact on suppliers' performance, they should be accounted for when building a picture of suppliers' qualities besides quality and delivery of products/services. As noted by Kouhizadeh et al. \cite{ref62}, currently there is a notable gap in the research on assessing blockchain in sustainable supply chain management because none of the models of evaluating suppliers considers actual metrics related to blockchain adoption.
+
+
+The most direct response to this gap is the framework developed by Vaezi et al. \cite{ref63}. This study constitutes the state-of-the-art of supplier selection models incorporating blockchain technologies and serves as the starting point for gap determination of the current study. In particular, their model employs compatibility with blockchain technologies as one of the evaluation dimensions in a Best--Worst Method (BWM) and Multi-Objective Optimization by Ratio Analysis plus Full Multiplicative Form (MULTIMOORA) selection technique while accounting for blockchain-specific criteria such as blockchain information security, decentralization degree, and interconnectivity alongside traditional economic and sustainability criteria. The selected suppliers' scores then serve as input parameters in a bi-criteria mixed-integer linear programming model for ordering in which blockchain-based cost criteria such as oracle costs, coordination costs, and smart contracts development costs are included in the objective function. As shown in their results, companies with higher scores for blockchain implementation have lower total procurement costs due to coordination and information verification costs considered, justifying a blockchain capability-based approach over a simple yes/no selection criterion. This framework, nevertheless, suffers from two structural weaknesses that this paper tackles head-on. One of them concerns the fact that the rating of a supplier is assessed at the time of evaluation and does not change over the planning period because there is no way to update ratings using information available in the blockchain database. The other problem is that the assessment process considers only the perspective of the buyer and does not account for the actual logic behind selecting the preferred supplier.
+
+\subsubsection{Blockchain-Enabled Matching}
+
+A separate strand of research has explored the implementation of matching algorithms as blockchain smart contracts, ensuring that partner assignment results can be independently verified, protected from alteration, and automatically enforced. Igboanusi et al. \cite{ref64} implemented an entire organ donation matching algorithm—the Blockchain-Enabled Organ Matching System (BOMS)—encompassing multiple criteria for biological compatibility, waiting period, proximity, and patient priority, in a blockchain smart contract running on the Ethereum platform, and demonstrated superior performance compared to previous attempts at blockchain-based matching in terms of security, traceability, and cross-matching efficiency. This idea is directly transposable to the problem of assigning suppliers and buyers in manufacturing organizations: once a matching algorithm is executed on the blockchain, it inherits the platform's immutable and auditable characteristics, meaning that every partner assignment can neither be altered nor disputed afterward. In procurement, where assignment decisions carry economic, contractual, and regulatory implications, this auditability addresses a governance requirement that off-chain matching methods cannot satisfy. The transposition from the medical to the industrial setting is well motivated: both situations involve multi-criteria matching under conditions of information asymmetry, both require that assignment decisions be justifiable against outside interference, and both occur in environments where the consequences of an incorrect pairing are significant. No literature, however, incorporates an algorithm for two-sided matching of buyers and sellers into a smart contract on a blockchain platform to facilitate industrial procurement assignments.
+
+
+\subsection{Consolidated Research Gaps and Study Direction}
+
+The literature review identifies a set of connected gaps that motivate the proposed framework. These gaps are consolidated here rather than repeated across separate literature subsections, because they collectively describe the same underlying problem: existing supplier--buyer selection models do not yet provide a reciprocal, dynamic, verifiable, and adaptive decision-support architecture.
+
+\begin{enumerate}
+\item \textbf{Unilateral evaluation gap:} Most existing models evaluate suppliers from the buyer's perspective only. They do not formally model the supplier's evaluation of buyers, even though customer attractiveness and preferred customer status strongly influence capacity allocation, responsiveness, pricing flexibility, and innovation support.
+\item \textbf{Static scoring gap:} Existing criteria weighting, supplier ranking, and order allocation models generally compute scores at a single point in time. They do not update partner evaluations continuously as new performance data become available.
+\item \textbf{Data integrity gap:} Many frameworks rely on expert judgments or historical records whose accuracy cannot be independently verified. This creates a gap between actual partner performance and the information used in evaluation.
+\item \textbf{Learning and feedback gap:} Many decision-support models lack learning mechanisms that improve future recommendations based on observed outcomes, disruptions, or relationship performance after selection.
+\item \textbf{Blockchain matching gap:} Blockchain applications in supply chains have mainly addressed traceability, transparency, and smart contract execution. Few studies use blockchain as part of an industrial two-sided matching logic for supplier--buyer assignment.
+\item \textbf{Method integration gap:} MCDM, machine learning, and blockchain are often studied separately. There is limited work integrating these tools into one coherent framework that supports criteria weighting, predictive scoring, reciprocal matching, and trusted data recording.
+\end{enumerate}
+
+\subsubsection{Research Objectives}
+
+Based on the consolidated gaps, this research aims to achieve the following objectives:
+
+\begin{itemize}
+\item To develop reciprocal supplier and buyer evaluation criteria that capture both buyer-to-supplier and supplier-to-buyer decision perspectives.
+\item To apply and compare MCDM methods for criteria weighting and partner ranking in a transparent decision-support structure.
+\item To incorporate data-driven scoring mechanisms that allow partner performance evaluations to become more adaptive over time.
+\item To design a matching logic that considers compatibility between supplier profiles and buyer profiles rather than relying on one-sided supplier ranking alone.
+\item To integrate blockchain-enabled recording to improve transparency, traceability, and trust in evaluation inputs and matching outcomes.
+\end{itemize}
+
+\subsubsection{Research Contributions}
+
+This study contributes a sector-aware and reciprocal decision-support framework for supplier--buyer evaluation, scoring, and selection. Its first contribution is conceptual: it treats buyer evaluation as customer attractiveness from the supplier's perspective, making the selection problem explicitly bilateral. Its second contribution is methodological: it combines MCDM-based criteria weighting, ranking methods, and data-driven scoring into one structured framework. Its third contribution is technological: it links the evaluation process to a blockchain-enabled environment so that key inputs and outcomes can be recorded transparently and audited. Together, these contributions directly respond to the unilateral evaluation, static scoring, data integrity, learning, blockchain matching, and method integration gaps identified above.
+
+\newpage
+\section{Methodology}
+
+\subsection{Research Design and Methodological Approach}
+
+This study adopts a hybrid, quantitative decision-support research design aimed at developing and validating a structured framework for bi-directional supplier--buyer selection within a blockchain-enabled supply chain environment. The proposed methodology integrates Multi-Criteria Decision-Making (MCDM) techniques, Machine Learning (ML), and Reinforcement Learning (RL) within a unified architecture to enhance decision accuracy, transparency, and adaptability.
+
+The research design is applied and system-oriented, focusing on solving a real-world procurement and matching problem where both suppliers and buyers evaluate each other simultaneously under multiple criteria. Unlike traditional unidirectional selection models, this study introduces a bi-directional evaluation mechanism, enabling more balanced and mutually beneficial partnerships.
+
+
+\subsubsection{Overall Framework Architecture}
+
+The overall framework is structured as a sequential and feedback-driven decision-support architecture. It begins with supplier and buyer data acquisition, proceeds through qualification screening, criteria weighting, alternative ranking, machine-learning prediction, hybrid score evaluation, matching optimization, and blockchain-based implementation, and ends with monitoring and feedback for continuous improvement.
+
+Figure~\ref{fig:framework-architecture} presents the complete framework architecture and illustrates the logical flow among the data acquisition, screening, MCDM, ML, RL, blockchain, and feedback components.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{Arch.png}
+\caption{Overall framework architecture for the proposed bi-directional supplier--buyer selection system.}
+\label{fig:framework-architecture}
+\end{figure}
+
+\subsubsection{Research Approach}
+
+The study follows a multi-stage methodological approach, where each stage performs a specific function within the decision-making pipeline. The framework is designed to ensure logical flow, data consistency, and iterative learning capability.
+
+\paragraph*{Stage I: Data Acquisition and Preprocessing}
+
+The process begins with structured data collection from both suppliers and buyers, including:
+
+\begin{itemize}
+\item Supplier performance records, such as quality and delivery reliability.
+\item Buyer characteristics, such as demand stability and financial reliability.
+\item Predefined evaluation criteria and weighting schemes.
+\end{itemize}
+
+The collected data undergoes normalization to ensure comparability across different scales and units. This step is essential for maintaining consistency in subsequent analytical processes.
+
+\paragraph*{Stage II: Screening via Binary Qualification Gates}
+
+Before applying advanced decision models, a preliminary filtering stage is introduced to eliminate unqualified entities. This includes:
+
+\begin{itemize}
+\item Quality and compliance requirements.
+\item Regulatory and Environmental, Social, and Governance (ESG) criteria.
+\item Health, Safety, and Environment (HSE) standards.
+\item Capacity and Minimum Order Quantity (MOQ) constraints.
+\end{itemize}
+
+Only suppliers and buyers that satisfy these mandatory conditions proceed to the evaluation stage. This reduces computational complexity and ensures feasibility of final matches.
+
+\paragraph*{Stage III: Criteria Weighting using MCDM Methods}
+
+The core of the decision-making process lies in determining the relative importance of evaluation criteria. The framework incorporates three weighting approaches:
+
+\begin{enumerate}
+\item \textbf{Direct Weighting:} Simple scoring based on expert judgment.
+\item \textbf{Analytic Hierarchy Process (AHP):} Utilizes pairwise comparison matrices and consistency validation to derive precise weights.
+\item \textbf{Fuzzy AHP (FAHP):} Extends AHP using fuzzy logic to handle uncertainty in linguistic judgments.
+\end{enumerate}
+
+This multi-method approach enhances robustness by allowing flexibility depending on the nature of expert input, whether crisp or fuzzy.
+
+\paragraph*{Stage IV: Alternative Ranking}
+
+Once criteria weights are established, supplier--buyer alternatives are evaluated using established MCDM ranking techniques:
+
+\begin{itemize}
+\item Technique for Order Preference by Similarity to Ideal Solution (TOPSIS).
+\item VIKOR method.
+\item AHP-based ranking for consistency with the weighting method.
+\end{itemize}
+
+This stage produces a ranked list of optimal supplier--buyer pairings based on multiple performance dimensions.
+
+\paragraph*{Stage V: Machine Learning Integration}
+
+To enhance predictive capability, the framework incorporates a machine learning module that utilizes:
+
+\begin{itemize}
+\item Historical performance data.
+\item Training and testing dataset splitting.
+\item Predictive modeling for supplier performance.
+\end{itemize}
+
+The ML model generates future performance predictions, which are validated and used to refine decision outcomes.
+
+\paragraph*{Stage VI: Hybrid Decision Evaluation}
+
+A hybrid mechanism combines:
+
+\begin{itemize}
+\item FAHP-derived criteria weights.
+\item ML-based predicted performance scores.
+\end{itemize}
+
+This integration produces adjusted final scores, improving decision accuracy by combining expert knowledge with data-driven insights.
+
+\paragraph*{Stage VII: Matching and Reinforcement Learning Optimization}
+
+The framework introduces an intelligent matching mechanism consisting of:
+
+\begin{itemize}
+\item Supplier--buyer grouping.
+\item Matching algorithm for initial pairing.
+\item Reinforcement Learning (RL) agent for optimization.
+\end{itemize}
+
+The RL agent iteratively improves matching decisions based on feedback, enabling the system to learn optimal pairing strategies over time.
+
+\paragraph*{Stage VIII: Blockchain-Based Implementation}
+
+To ensure transparency, security, and traceability, the final decisions are deployed within a blockchain layer that includes:
+
+\begin{itemize}
+\item Smart contracts for automated execution.
+\item Ledger storage for immutable data recording.
+\item Access control for data security.
+\item Audit trails for accountability.
+\end{itemize}
+
+This layer guarantees trust and integrity in supplier--buyer transactions.
+
+\paragraph*{Stage IX: Output, Monitoring, and Feedback Loop}
+
+The system generates:
+
+\begin{itemize}
+\item Recommendation reports.
+\item Performance dashboards.
+\item Model evaluation metrics.
+\end{itemize}
+
+Additionally, a continuous feedback mechanism captures new operational data, triggering model retraining and ensuring long-term adaptability.
+
+\subsubsection{Research Design Characteristics}
+
+The proposed research design exhibits the following characteristics:
+
+\begin{itemize}
+\item \textbf{Hybrid Methodology:} Combines MCDM, ML, RL, and blockchain technologies.
+\item \textbf{Bi-directional Evaluation:} Considers both supplier and buyer perspectives.
+\item \textbf{Dynamic Learning Capability:} Continuously improves through feedback and retraining.
+\item \textbf{Scalability:} Applicable across different industries and supply chain contexts.
+\item \textbf{Decision Transparency:} Ensured through blockchain integration.
+\end{itemize}
+
+\subsubsection{Justification of the Approach}
+
+The integration of multiple methodologies is justified as follows:
+
+\begin{itemize}
+\item MCDM techniques provide structured decision-making under multiple criteria.
+\item Machine learning introduces predictive intelligence.
+\item Reinforcement learning enables adaptive optimization.
+\item Blockchain ensures trust, transparency, and immutability.
+\end{itemize}
+
+Together, these components create a comprehensive and intelligent decision-support system capable of addressing the complexities of modern supply chain ecosystems.
+
+\subsection{Criteria Definition and Operationalization}
+
+The basis of any MCDM method is represented by the list of criteria used for assessing alternatives. The unique aspect of the introduced bi-directional method is the fact that two criteria lists are defined separately but in an analogous manner, one for assessing suppliers from the buyers' point of view and the other for evaluating buyers in relation to suppliers.
+
+This framework has been designed as an innovative modification of the system suggested by Prof.Zakaria et al. \cite{ref77}. In particular, three important improvements have been made, which include: (i) bi-directional evaluation, (ii) using FAHP for criteria weighting with consideration of uncertainties, and (iii) use of Machine Learning and Blockchain technologies in the decision-making process. Although the main criteria remain the same as used in the original study in order to provide opportunities for comparison, other aspects of this research are based on innovations of this study.
+
+In order to test the framework in its current form, a trial of the system using data gathered both through manual recording and through the creation of artificial data will be conducted. This is a decision on our part since it means that we can conduct tests on each element of the architecture separately. This would enable us to remove any external influences and test the architecture elements independently against possible flaws and inconsistencies. The collection of empirical data through the gathering of actual procurement data would be the next step in validating the framework.
+
+\subsubsection{Supplier Selection Criteria (Buyer's Perspective)}
+
+Drawing on established supply chain management literature, eight primary supplier evaluation criteria were operationalized for use within the comparative MCDM engine. Each criterion is defined as a weighted performance factor, enabling quantitative trade-off analysis across the FAHP and ML-enhanced scoring modules.
+
+\begin{enumerate}
+\item \textbf{Quality Performance:} Consistency in meeting quality specifications, defect rates, possession of relevant certifications (e.g., International Organization for Standardization (ISO) 9001 and International Automotive Task Force (IATF) 16949), and the effectiveness of quality control procedures.
+\item \textbf{Delivery Performance:} On-time delivery rates, consistency of lead times, order fulfillment accuracy, and responsiveness to fluctuating demand.
+\item \textbf{Cost Competitiveness:} Pricing structure, total cost of ownership (including logistics and quality verification costs), financial transparency, and availability of volume discounts.
+\item \textbf{Financial Stability:} Credit standing, overall financial health indicators, long-term business continuity capability, and demonstrated capacity for continuous reinvestment.
+\item \textbf{Technical Capability:} Technical expertise, problem-solving capacity, level of R\&D investment, and proven capacity for innovation.
+\item \textbf{Compliance and Sustainability:} Adherence to regulatory requirements, environmental standards, social responsibility practices, cybersecurity measures, and ethical business conduct.
+\item \textbf{Systems Integration:} Technology infrastructure compatibility with existing buyer systems, including Enterprise Resource Planning (ERP) and Electronic Data Interchange (EDI), digital capability maturity, and ease of onboarding and data exchange.
+\item \textbf{Experience and Track Record:} Relevant industry experience, documented case studies or verifiable references, and historical performance data indicating long-term reliability.
+\end{enumerate}
+
+These eight criteria constitute the supplier-side input layer of the decision matrix. Within the FAHP module, pairwise comparison matrices are constructed over these criteria to derive fuzzy priority weights. The ML component subsequently refines these weights dynamically, drawing on historical performance records---both manually entered and synthetically generated---to update importance scores and flag anomalies in supplier behavior.
+
+\subsubsection{Buyer Selection Criteria (Supplier's Perspective)}
+
+In order for this two-way structure to be implemented successfully, there are nine selection criteria for buyers which have been identified from the supplier's point of view. The rationale behind this is that suppliers, especially if their supply capacity is limited or they provide unique products, also evaluate their buyers. Selectivity is required in both directions to optimize the value chain relationship.
+
+\begin{enumerate}
+\item \textbf{Financial Stability and Creditworthiness:} The buyer's payment history, credit ratings, cash flow sustainability, and overall bankruptcy risk profile.
+\item \textbf{Payment Performance:} Historical on-time payment rates, consistency in settling invoices, dispute resolution efficiency, and adherence to agreed payment terms.
+\item \textbf{Order Volume and Growth Potential:} Current purchasing volume, demonstrated growth trajectory, order frequency, and forecasted potential for future demand increases.
+\item \textbf{Demand Stability and Predictability:} Consistency of ordering patterns, forecast accuracy, demand volatility, and degree of alignment with the supplier's production planning cycles.
+\item \textbf{Responsiveness and Collaboration:} Communication responsiveness, willingness to provide constructive feedback, engagement in joint problem-solving, and openness to collaborative improvement initiatives.
+\item \textbf{Compliance and Regulatory Standards:} Adherence to governance frameworks, data privacy regulations (e.g., General Data Protection Regulation (GDPR)), environmental responsibility standards, and ethical business practices.
+\item \textbf{Technical Sophistication and Systems Integration:} Capability for EDI and digital order placement, data sharing readiness, and compatibility with the supplier's technical and ERP infrastructure.
+\item \textbf{Market Reputation and Brand Impact:} The buyer's brand strength, market visibility, industry standing, and the potential reputational association---positive or negative---the relationship creates for the supplier.
+\item \textbf{Long-Term Strategic Value:} The buyer's strategic importance to the supplier's growth roadmap, potential for collaborative innovation, market expansion opportunities, and the prospects for a durable, high-value relationship.
+\end{enumerate}
+
+Combined, the above mentioned nine criteria become the input criteria for the decision-making matrix on the buyer's side. Similarly to what is used for the suppliers, the priorities of each criterion will be determined using the fuzzy weights obtained through FAHP, and the overall score for each supplier will be dynamically adjusted based on their behavior using the integrated machine learning algorithm.
+
+\subsection{Multi-Criteria Decision-Making Methods}
+
+This section details the four MCDM methods implemented in the proposed decision support framework. The Analytic Hierarchy Process (AHP) and its fuzzy extension (Fuzzy AHP) are employed for criteria weighting, as they allow for structured elicitation of expert judgment. TOPSIS and VIKOR are used as ranking engines, each providing a distinct decision philosophy for comparing potential partners. The integration of these methods supports comparative analysis of ranking consistency and robustness.
+
+\subsubsection{Analytic Hierarchy Process (AHP)}
+
+\paragraph{Methodological Foundation}
+
+The Analytic Hierarchy Process (AHP) is a structured multi-criteria decision-making method introduced by Saaty \cite{ref78} for dealing with complex evaluation problems. AHP decomposes a decision problem into a hierarchy and derives criteria priorities through pairwise comparisons using a fundamental 9-point scale. The method includes consistency validation, making it suitable for procurement and partner selection contexts where quantitative and qualitative criteria must be considered \cite{ref9,ref48}. In this study, AHP is used to obtain criteria weights from expert judgments and to calculate weighted scores for supplier and buyer alternatives.
+
+\paragraph{Implementation Steps}
+
+The AHP implementation follows the sequence shown in Figure~\ref{fig:ahp_steps}.
+
+\stepheading{Step 1: Criteria Pairwise Comparison}
+
+Experts compare evaluation criteria in pairs according to their relative importance using Saaty's 9-point scale, shown in Table~\ref{tab:ahp_scale}.
+
+\begin{table}[H]
+\centering
+\caption{AHP 9-Point Comparison Scale}
+\label{tab:ahp_scale}
+\begin{tabular}{cc}
+\toprule
+\textbf{Scale} & \textbf{Interpretation} \\
+\midrule
+1 & Equal importance \\
+3 & Moderate importance \\
+5 & Strong importance \\
+7 & Very strong importance \\
+9 & Extreme importance \\
+2, 4, 6, 8 & Intermediate values \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+\begin{center}
+\IfFileExists{AHP_Figure.png.jpeg}{%
+\includegraphics[width=0.95\textwidth,height=0.72\textheight,keepaspectratio]{AHP_Figure.png.jpeg}%
+}{%
+\fbox{\parbox[c][0.24\textheight][c]{0.76\textwidth}{\centering Figure file not found: \texttt{AHP\_Figure.png.jpeg}}}%
+}%
+\captionof{figure}{AHP Implementation Steps}
+\label{fig:ahp_steps}
+\end{center}
+\FloatBarrier
+
+
+
+\stepheading{Step 2: Construction of the Pairwise Comparison Matrix}
+
+A matrix $\mathbf{A}$ of size $n \times n$ is constructed, where each element $a_{ij}$ represents the importance of criterion $i$ relative to criterion $j$. The reciprocal rule is applied such that $a_{ji}=1/a_{ij}$, and $a_{ii}=1$ for all diagonal elements.
+
+\stepheading{Step 3: Normalization of the Comparison Matrix}
+
+Each element is normalized by dividing it by the sum of its column:
+\[
+n_{ij}=\frac{a_{ij}}{\sum_{k=1}^{n}a_{kj}}
+\]
+
+\stepheading{Step 4: Calculation of Criteria Weights}
+
+The weight for criterion $i$ is calculated as the average of the normalized values in row $i$:
+\[
+w_i=\frac{1}{n}\sum_{j=1}^{n}n_{ij}
+\]
+where the resulting weights satisfy:
+\[
+\sum_{i=1}^{n}w_i=1, \quad w_i>0
+\]
+
+\stepheading{Step 5: Consistency Check}
+
+The Consistency Index (CI) and Consistency Ratio (CR) are calculated as:
+\[
+CI=\frac{\lambda_{\max}-n}{n-1}
+\]
+\[
+CR=\frac{CI}{RI}
+\]
+where $RI$ is the Random Index shown in Table~\ref{tab:ri_values}. A $CR\leq0.10$ is considered acceptable.
+
+\begin{table}[H]
+\centering
+\caption{Random Index (RI) Values}
+\label{tab:ri_values}
+\begin{tabular}{ccccccccccc}
+\toprule
+$n$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+\midrule
+RI & 0 & 0 & 0.58 & 0.90 & 1.12 & 1.24 & 1.32 & 1.41 & 1.45 & 1.49 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\stepheading{Step 6: Supplier or Buyer Alternative Scoring}
+
+After consistent weights are obtained, each supplier or buyer is evaluated against the criteria using quantitative data or expert assessment.
+
+\stepheading{Step 7: Calculation of Weighted Scores and Ranking}
+
+The final score for alternative $i$ is calculated as:
+\[
+S_i=\sum_{j=1}^{n}(w_j\times s_{ij})
+\]
+where $S_i$ is the final score, $w_j$ is criterion weight, and $s_{ij}$ is the normalized performance score. Alternatives are ranked in descending order.
+
+\paragraph{Methodological Considerations}
+
+\textbf{Strengths:} AHP provides a structured and transparent decision-making framework, supports both qualitative and quantitative judgments, and includes a consistency ratio that validates the coherence of expert judgments.
+
+\textbf{Limitations:} AHP assumes criteria independence, depends on subjective judgment quality, may experience rank reversal, and becomes cognitively demanding as the number of criteria and alternatives increases \cite{ref34,ref50}.
+
+\subsubsection{Fuzzy Analytic Hierarchy Process (Fuzzy AHP)}
+
+\paragraph{Methodological Foundation}
+
+Traditional AHP uses crisp values, which may not capture uncertainty in human judgment. Fuzzy AHP addresses this limitation by incorporating fuzzy set theory \cite{ref79}. Judgments are represented by Triangular Fuzzy Numbers (TFNs), defined by lower, most likely, and upper values $(l,m,u)$. In this study, FAHP captures vagueness in expert procurement judgments and enables robustness comparison against classical AHP.
+
+\paragraph{Implementation Steps}
+
+The FAHP implementation follows the sequence shown in Figure~\ref{fig:fuzzy_ahp_steps} and uses Buckley's geometric mean method for fuzzy weight calculation.
+
+\stepheading{Step 1: Criteria Fuzzy Pairwise Comparison}
+
+Experts compare criteria using linguistic terms mapped to Triangular Fuzzy Numbers, as shown in Table~\ref{tab:fuzzy_scale}.
+
+\begin{table}[H]
+\centering
+\caption{Fuzzy AHP Linguistic Scale and Corresponding TFNs}
+\label{tab:fuzzy_scale}
+\begin{tabular}{lc}
+\toprule
+\textbf{Linguistic Term} & \textbf{Triangular Fuzzy Number $(l,m,u)$} \\
+\midrule
+Equally important & (1, 1, 1) \\
+Weakly more important & (1, 2, 3) \\
+Moderately more important & (2, 3, 4) \\
+Strongly more important & (3, 4, 5) \\
+Very strongly more important & (4, 5, 6) \\
+Extremely more important & (5, 6, 7) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+\begin{center}
+\IfFileExists{Fuzzy_AHP_Figure.png.jpeg}{%
+\includegraphics[width=0.95\textwidth,height=0.72\textheight,keepaspectratio]{Fuzzy_AHP_Figure.png.jpeg}%
+}{%
+\fbox{\parbox[c][0.24\textheight][c]{0.76\textwidth}{\centering Figure file not found: \texttt{Fuzzy\_AHP\_Figure.png.jpeg}}}%
+}%
+\captionof{figure}{Fuzzy AHP Implementation Steps}
+\label{fig:fuzzy_ahp_steps}
+\end{center}
+\FloatBarrier
+
+A Triangular Fuzzy Number (TFN) $\tilde{a}=(l,m,u)$ has membership function:
+\[
+\mu_{\tilde{a}}(x)=
+\begin{cases}
+0 & x<l \\
+\frac{x-l}{m-l} & l\leq x\leq m \\
+\frac{u-x}{u-m} & m\leq x\leq u \\
+0 & x>u
+\end{cases}
+\]
+
+\stepheading{Step 2: Construct the Fuzzy Pairwise Comparison Matrix}
+
+A fuzzy matrix $\tilde{\mathbf{A}}$ is constructed with $\tilde{a}_{ij}=(l_{ij},m_{ij},u_{ij})$. Fuzzy reciprocals preserve consistency:
+\[
+\tilde{a}_{ji}=\left(\frac{1}{u_{ij}},\frac{1}{m_{ij}},\frac{1}{l_{ij}}\right)
+\]
+
+\stepheading{Step 3: Calculate Fuzzy Weights Using Buckley's Geometric Mean Method}
+
+For each criterion $i$, the fuzzy geometric mean is calculated as \cite{ref80}:
+\[
+\tilde{r}_i=(\tilde{a}_{i1}\otimes\tilde{a}_{i2}\otimes\cdots\otimes\tilde{a}_{in})^{1/n}
+\]
+The fuzzy weight is then:
+\[
+\tilde{w}_i=\tilde{r}_i\otimes(\tilde{r}_1\oplus\tilde{r}_2\oplus\cdots\oplus\tilde{r}_n)^{-1}
+\]
+
+\stepheading{Step 4: Defuzzify Fuzzy Weights to Crisp Values}
+
+The Center of Area method is used:
+\[
+w_i^{\text{crisp}}=\frac{l_i+m_i+u_i}{3}
+\]
+The weights are normalized as:
+\[
+w_i^{\text{normalized}}=\frac{w_i^{\text{crisp}}}{\sum_{k=1}^{n}w_k^{\text{crisp}}}
+\]
+
+\stepheading{Step 5: Fuzzy Consistency Check}
+
+The midpoint matrix is extracted and checked using the standard AHP consistency procedure. A $CR\leq0.10$ is considered acceptable.
+
+\stepheading{Step 6: Supplier or Buyer Alternative Scoring}
+
+After defuzzification, each supplier or buyer is evaluated against the criteria using quantitative data or expert assessment.
+
+\stepheading{Step 7: Calculate Weighted Scores and Ranking}
+
+The final weighted score is:
+\[
+S_i=\sum_{j=1}^{n}(w_j\times s_{ij})
+\]
+Alternatives are ranked in descending order of final score.
+
+\paragraph{Methodological Considerations}
+
+\begin{description}[leftmargin=1.8em, labelsep=0.6em, style=nextline]
+\item[Strengths:] FAHP handles ambiguity and subjectivity more effectively than crisp AHP, allows linguistic judgments, reduces cognitive pressure, and preserves consistency checking.
+\item[Limitations:] FAHP is computationally more complex, less intuitive for non-experts, sensitive to fuzzy scale selection, and loses part of the uncertainty information during defuzzification.
+\end{description}
+
+\subsubsection{Technique for Order Preference by Similarity to Ideal Solution (TOPSIS)}
+
+\paragraph{Methodological Foundation}
+
+TOPSIS, introduced by Hwang and Yoon \cite{ref81}, ranks alternatives by measuring their simultaneous proximity to the Positive Ideal Solution (PIS) and distance from the Negative Ideal Solution (NIS) using Euclidean geometry. The PIS represents the best attainable value for each criterion, while the NIS represents the worst. An alternative is preferred when it is closest to the PIS and farthest from the NIS, with both distances condensed into a single closeness coefficient. In this study, TOPSIS is applied to the weighted outputs of the AHP and FAHP stages to rank supplier--buyer alternatives across both the eight-criterion buyer evaluation matrix and the nine-criterion supplier evaluation matrix \cite{ref25}.
+
+\paragraph{Implementation Steps}
+
+The TOPSIS implementation proceeds through the following sequential steps.
+
+
+\begin{figure}[p]
+\centering
+\includegraphics[height=0.9\textheight,keepaspectratio]{TOPSIS.drawio.png}
+\caption{TOPSIS Implementation Diagram.}
+\label{fig:TOPSIS}
+\end{figure}
+
+
+
+
+
+\stepheading{Step 1: Construct the Decision Matrix}
+
+A decision matrix $X=[x_{ij}]_{m\times n}$ is assembled, where $m$ is the number of alternatives and $n$ is the number of criteria. Each element $x_{ij}$ represents the performance score of alternative $i$ on criterion $j$, sourced from blockchain-verified records or expert assessment.
+
+\stepheading{Step 2: Normalise the Decision Matrix}
+
+Vector normalisation is applied to obtain the normalised matrix $R$:
+\[
+r_{ij}=\frac{x_{ij}}{\sqrt{\sum_{k=1}^{m}x_{kj}^{2}}}
+\]
+where the denominator is the Euclidean norm of column $j$, ensuring commensurability across criteria of different measurement scales.
+
+\stepheading{Step 3: Construct the Weighted Normalised Matrix}
+
+Each normalised value is multiplied by the corresponding criterion weight $w_j$ derived from the AHP or FAHP stage:
+\[
+v_{ij}=w_j\times r_{ij}
+\]
+
+\stepheading{Step 4: Determine the PIS and NIS}
+
+For each criterion $j$, the ideal best and ideal worst values are identified across all alternatives:
+\[
+v_j^*=\begin{cases}
+\max_i(v_{ij}), & j\in J^+ \\
+\min_i(v_{ij}), & j\in J^-
+\end{cases}
+\]
+\[
+v_j^-=\begin{cases}
+\min_i(v_{ij}), & j\in J^+ \\
+\max_i(v_{ij}), & j\in J^-
+\end{cases}
+\]
+where $J^+$ is the set of benefit criteria and $J^-$ is the set of cost criteria.
+
+\stepheading{Step 5: Calculate the Separation Distances}
+
+The Euclidean distance of each alternative from the PIS and NIS is computed as:
+\[
+D_i^*=\sqrt{\sum_{j=1}^{n}(v_{ij}-v_j^*)^2}
+\]
+\[
+D_i^-=\sqrt{\sum_{j=1}^{n}(v_{ij}-v_j^-)^2}
+\]
+
+\stepheading{Step 6: Calculate the Relative Closeness Coefficient}
+
+The relative closeness coefficient for each alternative is computed as:
+\[
+CC_i=\frac{D_i^-}{D_i^*+D_i^-}
+\]
+$CC_i$ lies in $[0,1]$; a value approaching 1 indicates greater proximity to the PIS.
+
+\stepheading{Step 7: Rank the Alternatives}
+
+Alternatives are ranked in descending order of $CC_i$. Separate ranked lists are produced for the buyer's assessment of suppliers and the supplier's assessment of buyers, and both are forwarded as inputs to the stable matching and reinforcement learning stages.
+
+\paragraph{Methodological Considerations}
+
+\begin{description}[leftmargin=1.8em, labelsep=0.6em, style=nextline]
+\item[Strengths:] TOPSIS is computationally efficient, accommodates criteria of different units through vector normalisation, directly integrates AHP- and FAHP-derived weights, and yields a continuous closeness index that supports fine-grained discrimination among alternatives. Its deterministic nature ensures ranking reproducibility, which is essential for blockchain-auditable procurement decisions.
+\item[Limitations:] TOPSIS is susceptible to rank reversal when the alternative set changes, as the PIS and NIS shift with each pool update, which is a non-trivial concern in dynamic supply chain environments. The method also assumes criteria independence, does not explicitly model inter-criteria correlations, and its single scalar output may obscure trade-off structures that are relevant to procurement decision-makers \cite{ref81}.
+\end{description}
+
+\subsubsection{VIKOR}
+
+\paragraph{Methodological Foundation}
+
+VIKOR (VIseKriterijumska Optimizacija I Kompromisno Resenje) is a compromise ranking method developed by Opricovic \cite{ref82} and further formalised by Opricovic and Tzeng \cite{ref83}. Unlike TOPSIS, which ranks by geometric distance, VIKOR applies the $L_p$-metric to derive two complementary measures: the aggregate utility measure $S_i$, reflecting overall weighted regret across all criteria, and the maximum individual regret measure $R_i$, reflecting the worst single-criterion shortfall. These are combined into a compromise index $Q_i$ via a strategy weight $v$ that balances majority-rule utility against opponent-concession regret. In this study, $v=0.5$ is adopted, and VIKOR is applied in parallel with TOPSIS to enable cross-validation of ranking stability across both bi-directional evaluation matrices \cite{ref75}.
+
+\paragraph{Implementation Steps}
+
+The VIKOR implementation proceeds through the following sequential steps.
+
+
+
+\begin{figure}[p]
+\centering
+\includegraphics[height=0.9\textheight,keepaspectratio]{VIKOR Diagram.drawio.png}
+\caption{VIKOR Implementation Diagram.}
+\label{fig:VIKOR}
+\end{figure}
+
+\stepheading{Step 1: Construct the Decision Matrix}
+
+A decision matrix $X=[x_{ij}]_{m\times n}$ is assembled following the same procedure described in the TOPSIS implementation steps.
+
+\stepheading{Step 2: Determine the Best and Worst Values}
+
+For each criterion $j$, the best value $f_j^*$ and worst value $f_j^-$ are identified in the original performance space:
+\[
+f_j^*=\begin{cases}
+\max_i(x_{ij}), & j\in J^+ \\
+\min_i(x_{ij}), & j\in J^-
+\end{cases}
+\]
+\[
+f_j^-=\begin{cases}
+\min_i(x_{ij}), & j\in J^+ \\
+\max_i(x_{ij}), & j\in J^-
+\end{cases}
+\]
+
+\stepheading{Step 3: Calculate the Utility Measure $S_i$ and the Regret Measure $R_i$}
+
+For each alternative $i$, the weighted normalised regret measures are computed as:
+\[
+S_i=\sum_{j=1}^{n}\left[w_j\times\frac{f_j^*-x_{ij}}{f_j^*-f_j^-}\right]
+\]
+\[
+R_i=\max_j\left[w_j\times\frac{f_j^*-x_{ij}}{f_j^*-f_j^-}\right]
+\]
+where $w_j$ are the criteria weights from the AHP or FAHP stage, and the normalised gap $(f_j^*-x_{ij})/(f_j^*-f_j^-)$ expresses each alternative's shortfall from the best attainable value as a proportion of the full criterion range.
+
+\stepheading{Step 4: Calculate the VIKOR Index $Q_i$}
+
+The compromise index is computed as:
+\[
+Q_i=v\times\left[\frac{S_i-S^*}{S^- - S^*}\right]+(1-v)\times\left[\frac{R_i-R^*}{R^- - R^*}\right]
+\]
+where $S^*=\min_i(S_i)$, $S^-=\max_i(S_i)$, $R^*=\min_i(R_i)$, and $R^-=\max_i(R_i)$.
+
+\stepheading{Step 5: Rank the Alternatives}
+
+Three ranked lists are produced by sorting alternatives in ascending order of $S_i$, $R_i$, and $Q_i$, respectively, where smaller values indicate better compromise performance.
+
+\stepheading{Step 6: Verify the Compromise Solution}
+
+The alternative $a'$ ranked first by $Q_i$ is accepted as the compromise solution if two conditions are satisfied: (C1) the advantage gap $Q(a'')-Q(a')\geq1/(m-1)$, where $a''$ is the second-ranked alternative; and (C2) $a'$ is also ranked first by at least one of $S_i$ or $R_i$. If either condition is violated, a set of compromise solutions is proposed and forwarded to the matching and reinforcement learning stages.
+
+\paragraph{Methodological Considerations}
+
+\begin{description}[leftmargin=1.8em, labelsep=0.6em, style=nextline]
+\item[Strengths:] VIKOR explicitly separates group utility from individual regret and reports both alongside the aggregate index, providing decision-makers with a richer basis for procurement judgment than a single scalar ranking. The adjustable strategy weight $v$ allows the decision philosophy to be tuned to organisational risk preferences, and the normalised gap formulation makes the method inherently robust to criteria measured on different scales \cite{ref75,ref83}.
+\item[Limitations:] VIKOR shares TOPSIS's rank reversal vulnerability, as the reference values $f_j^*$ and $f_j^-$ are defined relative to the current alternative set and must be recomputed each time the pool changes. The choice of strategy weight $v$ is subjective, and the method assumes criteria independence, so correlated criteria may be implicitly double-counted within the utility measure \cite{ref82,ref83}.
+\end{description}
+
+\clearpage
+\begin{thebibliography}{99}
+\bibitem{ref1} W. Villegas-Ch, A. M. Navarro, and S. Sanchez-Viteri, ``Optimization of inventory management through computer vision and machine learning technologies,'' Intell. Syst. Appl., vol. 24, p. 200438, 2024. doi:10.1016/j.iswa.2024.200438
+\bibitem{ref2} H. M. Gámez-Albán, R. Guisson, and A. De Meyer, ``Optimizing the organization of the first mile in agri-food supply chains with a heterogeneous fleet using a mixed-integer linear model,'' Intell. Syst. Appl., vol. 23, p. 200426, 2024. doi:10.1016/j.iswa.2024.200426
+\bibitem{ref3} M. Brandenburg, T. Gruchmann, and N. Oelze, ``Sustainable supply chain management: A conceptual framework and future research perspectives,'' Sustainability, vol. 11, p. 7239, 2019. doi:10.3390/su11247239
+\bibitem{ref4} W. Liu, Y. Liu, P. T.-W. Lee, C. Yuan, S. Long, and Y. Cheng, ``Effects of supply chain innovation and application policy on firm performance: Evidence from China,'' Prod. Plan. Control, pp. 1--13, 2024. = doi:10.1080/09537287.2024.2405713
+\bibitem{ref5} M. Christopher, Logistics \& Supply Chain Management. Harlow, U.K.: Pearson, 2016.
+\bibitem{ref6} McKinsey Global Institute, ``Risk, resilience, and rebalancing in global value chains,'' McKinsey \& Company, Aug. 2020. [Online]. Available: mckinsey.com.
+\bibitem{ref7} Deloitte, ``2021 Global Chief Procurement Officer Survey: Recalibrating for resilience,'' Deloitte Insights, 2021. [Online]. Available: deloitte.com.
+\bibitem{ref8} D. Gale and L. S. Shapley, ``College admissions and the stability of marriage,'' Am. Math. Mon., vol. 69, no. 1, pp. 9--15, Jan. 1962, doi: 10.2307/2312726.
+\bibitem{ref9} W. Ho, X. Xu, and P. K. Dey, ``Multi-criteria decision making approaches for supplier evaluation and selection: A literature review,'' Eur. J. Oper. Res., vol. 202, no. 1, pp. 16--24, Jan. 2010, doi: 10.1016/j.ejor.2009.05.009.
+\bibitem{ref10} C. S. Tang, ``Perspectives in supply chain risk management,'' Int. J. Prod. Econ., vol. 103, no. 2, pp. 451--488, Oct. 2006, doi: 10.1016/j.ijpe.2005.12.006.
+\bibitem{ref11} A. Wetzstein, E. Hartmann, W. C. Benton, and N. O. Hohenstein, ``A systematic assessment of supplier selection literature -- State-of-the-art and future scope,'' Int. J. Prod. Econ., vol. 182, pp. 304--323, Dec. 2016, doi: 10.1016/j.ijpe.2016.06.022.
+\bibitem{ref12} Dickson, G. W. (1966). An analysis of vendor selection and the buying process. Journal of Purchasing, 2(1), 5-17. doi: 10.1111/j.1745-493X.1966.tb00818.x
+\bibitem{ref13} F. Dweiri, S. Kumar, S. A. Khan, and V. Jain, ``Designing an integrated AHP based decision support system for supplier selection in automotive industry,'' Expert Syst. Appl., vol. 62, pp. 273--283, Nov. 2016, doi: 10.1016/j.eswa.2016.06.030.
+\bibitem{ref14} N. J. Pulles, H. Schiele, J. Veldman, and L. Hüttinger, ``The impact of customer attractiveness and supplier satisfaction on becoming a preferred customer,'' Ind. Mark. Manag., vol. 54, pp. 129--140, Apr. 2016, doi: 10.1016/j.indmarman.2015.06.004.
+\bibitem{ref15} S. Hosseini and K. Barker, ``A Bayesian network model for resilience-based supplier selection,'' Int. J. Prod. Econ., vol. 180, pp. 68--87, Oct. 2016, doi: 10.1016/j.ijpe.2016.07.007.
+\bibitem{ref16} D. Ivanov, A. Dolgui, and B. Sokolov, ``The impact of digital technology and Industry 4.0 on the ripple effect and supply chain risk analytics,'' Int. J. Prod. Res., vol. 57, no. 3, pp. 829--846, 2019, doi: 10.1080/00207543.2018.1488086.
+\bibitem{ref17} I. Heckmann, T. Comes, and S. Nickel, ``A critical review on supply chain risk: Definition, measure and modeling,'' Omega, vol. 52, pp. 119--132, Apr. 2015, doi: 10.1016/j.omega.2014.10.004.
+\bibitem{ref18} N. Grover, ``Blockchain-enabled autonomous supply chain management: A multi-agent reinforcement learning approach with dynamic smart contract optimization,'' Int. Res. J. Mod. Eng. Technol. Sci., vol. 7, no. 7, pp. 2649--2656, Jul. 2025, doi: 10.56726/IRJMETS81353.
+\bibitem{ref19} K. Abbas, M. Afaq, T. A. Khan, and W.-C. Song, ``A blockchain and machine learning-based drug supply chain management and recommendation system for smart pharmaceutical industry,'' Electronics, vol. 9, no. 5, p. 852, May 2020, doi: 10.3390/electronics9050852.
+\bibitem{ref20} Borade, A. B., \& Bansod, S. V. (2007). Domain of supply chain management -- A state of art. Journal of Technology Management \& Innovation, 2(4), 109--121. jotmi.org/domain\_of\_supply\_chain\_management
+\bibitem{ref21} Agrawal, P., \& Narain, R. (2018). Digital supply chain management: An overview. IOP Conference Series: Materials Science and Engineering, 455, 012074. doi:10.1088/1757-899X/455/1/012074
+\bibitem{ref22} Saad, N. A., Elgazzar, S., \& Mlaker Kac, S. (2022). Linking supply chain management practices to customer relationship management objectives: A proposed framework. Business: Theory and Practice, 23(1), 154--164. doi:10.3846/btp.2022.15475
+\bibitem{ref23} Sultana, M. N., Rahman, M. H., \& Al Mamun, A. (2016). Multi criteria decision making tools for supplier evaluation and selection: A review. European Journal of Advances in Engineering and Technology, 3(5), 56--65. researchgate/Multi-Criteria-Decision-Making
+\bibitem{ref24} Dalalah, D., Hayajneh, M., \& Batieha, F. (2011). A fuzzy multi-criteria decision making model for supplier selection. Expert Systems with Applications, 38(7), 8384--8391. doi:10.1016/j.eswa.2011.01.031
+\bibitem{ref25} Jain, V., Sangaiah, A. K., Sakhuja, S., Thoduka, N., \& Aggarwal, R. (2018). Supplier selection using fuzzy AHP and TOPSIS: A case study in the Indian automotive industry. Neural Computing and Applications, 29(7), 555--564. doi:10.1007/s00521-016-2533-z
+\bibitem{ref26} Kar, A. K., \& Pani, A. K. (2014). Exploring the importance of different supplier selection criteria. Management Research Review, 37(1), 89--105. doi:10.1108/MRR-10-2012-0230
+\bibitem{ref27} Luthra, S., Govindan, K., Kannan, D., Mangla, S. K., \& Garg, C. P. (2017). An integrated framework for sustainable supplier selection and evaluation in supply chains. Journal of Cleaner Production, 140, 1686--1698. doi:10.1016/j.jclepro.2016.09.078
+\bibitem{ref28} Kant, R., \& Dalvi, M. V. (2017). Development of questionnaire to assess the supplier evaluation criteria and supplier selection benefits. Benchmarking: An International Journal, 24(2), 359--383. doi:10.1108/BIJ-12-2015-0124
+\bibitem{ref29} C.-N. Wang, H.-T. Tsai, N. V. Thanh, V. T. Nguyen, and Y.-F. Huang, ``A hybrid fuzzy analytic hierarchy process and the technique for order of preference by similarity to ideal solution supplier evaluation and selection in the food processing industry,'' Symmetry, vol. 12, no. 2, p. 211, 2020, doi:10.3390/sym12020211.
+\bibitem{ref30} Seçkin, F., \& Güngör Şen, C. (2018). A conceptual framework for buyer-supplier integration strategies and their association to the supplier selection criteria in the light of sustainability. Journal of Aeronautics and Space Technologies, 11(1), 91--106. jast.msu.edu/JAST/article/298
+\bibitem{ref31} Uygun, Ö., \& Dede, A. (2013). Supplier selection for automotive industry using multi- criteria decision making techniques. The Online Journal of Science and Technology, 3(4), 126-- 136. CorpusID:112905500
+\bibitem{ref32} Hüttinger, L., Schiele, H., \& Veldman, J. (2012). The drivers of customer attractiveness, supplier satisfaction and preferred customer status: A literature review. Industrial Marketing Management, 41(8), 1194--1205. doi:10.1016/j.indmarman.2012.10.004
+\bibitem{ref33} Hald, K. S., Cordon, C., \& Vollmann, T. E. (2009). Towards an understanding of attraction in buyer--supplier relationships. Industrial Marketing Management, 38(8), 960--970. doi:10.1016/j.indmarman.2008.04.015
+\bibitem{ref34} Makkonen, H., Vuori, M., \& Puranen, M. (2016). Buyer attractiveness as a catalyst for buyer--supplier relationship development. Industrial Marketing Management, 55, 156--168. doi:10.1016/j.indmarman.2015.09.004
+\bibitem{ref35} Lima Junior, F. R., Osiro, L., \& Carpinetti, L. C. R. (2014). A comparison between Fuzzy AHP and Fuzzy TOPSIS methods to supplier selection. Applied Soft Computing, 21, 194--209. doi:10.1016/j.asoc.2014.03.014
+\bibitem{ref36} Chen, C.-H. (2020). A novel multi-criteria decision-making model for building material supplier selection based on entropy-AHP weighted TOPSIS. Entropy, 22(2), 259. doi:10.3390/e22020259
+\bibitem{ref37} Resende, C. H. L., Geraldes, C. A. S., \& Lima, F. R., Junior. (2021). Decision Models for Supplier Selection in Industry 4.0 Era: A Systematic Literature Review. Procedia Manufacturing, 55, 492--499. https://doi.org/10.1016/j.promfg.2021.10.067
+\bibitem{ref38} Ali, Md. R., Nipu, S. Md. A., \& Khan, S. A. (2023). A decision support system for classifying supplier selection criteria using machine learning and random forest approach. Decision Analytics Journal, 7, 100238. https://doi.org/10.1016/j.dajour.2023.100238
+\bibitem{ref39} Husna, A. ul, Ghasempoor, A., \& Amin, S. H. (2024). A proposed framework for supplier selection and order allocation using machine learning clustering and optimization techniques. Journal of Data, Information and Management, 6(3), 235--254. https://doi.org/10.1007/s42488-024-00127-y
+\bibitem{ref40} Andrade Ferreira, A. C., de Pinho, A. F., Francisco, M. B., de Siqueira, L. A., Jr., \& Vasconcelos, G. A. V. B. (2025). A Decision Support System for Classifying Suppliers Based on Machine Learning Techniques: A Case Study in the Aeronautics Industry. Computers, 14(7), 271. https://doi.org/10.3390/computers14070271
+\bibitem{ref41} Biswas, A., \& Basak, S. (2026). Developing an efficient supplier performance evaluation and selection process by integrating the MARCOS method. Array, 29, 100742. https://doi.org/10.1016/j.array.2026.100742
+\bibitem{ref42a} Gidiagba, O. J., Tartibu, L., \& Okwu, M. (2025). Integrating Machine Learning with Multi-Criteria Decision-Making Models for Sustainable Supplier Selection in Dynamic Supply Chains. Logistics, 9(4), 152. https://doi.org/10.3390/logistics9040152
+\bibitem{ref43} Abdulla, A., \& Baryannis, G. (2024). A hybrid multi-criteria decision-making and machine learning approach for explainable supplier selection. Supply Chain Analytics, 7, 100074. https://doi.org/10.1016/j.sca.2024.100074
+\bibitem{ref44} Tajally, A., Vamarzani, M. Z., Ghanavati-Nejad, M., Zeynali, F. R., Abbasian, M., \& Bahengam, A. (2025). A hybrid machine learning-based decision-making model for viable supplier selection problem considering circular economy dimensions. Environment, Development and Sustainability. https://doi.org/10.1007/s10668-025-06014-9
+
+\bibitem{ref46a} Molaei, B. J., Ghanavati-Nejad, M., Tajally, A., \& Sheikhalishahi, M. (2025). A novel stochastic machine learning approach for resilient-leagile supplier selection: a circular supply chain in the era of industry 4.0. Soft Computing, 29(6), 2845--2866. https://doi.org/10.1007/s00500-025-10578-z
+
+\bibitem{ref48} Shahabi, A. (2025). A white-box decision support model for evaluating the suppliers based on the customer-based and viability dimensions: a case study of the e-commerce business. Annals of Operations Research. https://doi.org/10.1007/s10479-025-06940-x
+
+\bibitem{ref50} Islam, S., Amin, S. H., \& Wardley, L. J. (2021). Machine learning and optimization models for supplier selection and order allocation planning. International Journal of Production Economics, 242, 108315. https://doi.org/10.1016/j.ijpe.2021.108315
+
+\bibitem{ref52} Francisco, K., \& Swanson, D. (2018). The supply chain has no clothes: Technology adoption of blockchain for supply chain transparency. Logistics, 2(1), 2. doi: 10.3390/logistics2010002
+\bibitem{ref53} Kshetri, N. (2018). Blockchain's roles in meeting key supply chain management objectives. International Journal of Information Management, 39, 80--89. doi: 10.1016/j.ijinfomgt.2017.12.005
+\bibitem{ref54} Wang, Y., Han, J.H., \& Beynon-Davies, P. (2019). Understanding blockchain technology for future supply chains: a systematic literature review and research agenda. Supply Chain Management: An International Journal, 24(1), 62--84. doi: 10.1108/SCM-01-2018-0029
+\bibitem{ref55} Saberi, S., Kouhizadeh, M., Sarkis, J., \& Shen, L. (2019). Blockchain technology and its relationships to sustainable supply chain management. International Journal of Production Research, 57(7), 2117--2135. doi: 10.1080/00207543.2018.1533261
+\bibitem{ref56} Queiroz, M.M., \& Wamba, S.F. (2019). Blockchain adoption challenges in supply chain: An empirical investigation of the main drivers in India and the USA. International Journal of Information Management, 46, 70--82. doi: 10.1016/j.ijinfomgt.2019.01.005
+\bibitem{ref57} Schmidt, C.G., \& Wagner, S.M. (2019). Blockchain and supply chain relations: A transaction cost theory perspective. Journal of Purchasing and Supply Management, 25(4), 100552. doi: 10.1016/j.pursup.2019.100552
+\bibitem{ref58} Min, H. (2019). Blockchain technology for enhancing supply chain resilience. Business Horizons, 62(1), 35--45. doi: 10.1016/j.bushor.2018.08.012
+\bibitem{ref59} Pournader, M., Shi, Y., Seuring, S., \& Koh, S.C.L. (2020). Blockchain applications in supply chains, transport and logistics: a systematic review of the literature. International Journal of Production Research, 58(7), 2063--2081. doi: 10.1080/00207543.2019.1650976
+\bibitem{ref60} Chang, Y., Iakovou, E., \& Shi, W. (2020). Blockchain in global supply chains and cross border trade: a critical synthesis of the state-of-the-art, challenges and opportunities. International Journal of Production Research, 58(7), 2082--2099. doi: 10.1080/00207543.2019.1651946
+\bibitem{ref62} Kouhizadeh, M., Saberi, S., \& Sarkis, J. (2021). Blockchain technology and the sustainable supply chain: Theoretically exploring adoption barriers. International Journal of Production Economics, 231, 107831. doi: 10.1016/j.ijpe.2020.107831
+\bibitem{ref63} Vaezi, A., Rabbani, E., \& Yazdian, S.A. (2024). Blockchain-integrated sustainable supplier selection and order allocation: A hybrid BWM-MULTIMOORA and bi-objective programming approach. Journal of Cleaner Production, 444, 141216. doi: 10.1016/j.jclepro.2024.141216
+\bibitem{ref64} Igboanusi, I.S., Nnadiekwe, C.A., Ogbede, J.U., Kim, D.-S., \& Lensky, A. (2024). BOMS: Blockchain-enabled organ matching system. Scientific Reports, 14, 16069. doi: 10.1038/s41598-024-66375-5
+\bibitem{ref65} Park, A., \& Li, H. (2021). The effect of blockchain technology on supply chain sustainability performances. Sustainability, 13(4), 1726. doi: 10.3390/su13041726
+\bibitem{ref66} Wamba, S.F., \& Queiroz, M.M. (2020). Blockchain in the operations and supply chain management: Benefits, challenges and future research opportunities. International Journal of Information Management, 52, 102064. doi: 10.1016/j.ijinfomgt.2019.102064
+\bibitem{ref67} A. Alejo-Reyes, A. Mendoza, and E. Olivares-Benitez, ``A heuristic method for the supplier selection and order quantity allocation problem,'' Appl. Math. Model., vol. 90, pp. 1130--1142, 2021, doi: 10.1016/j.apm.2020.10.024.
+\bibitem{ref68} K. Jenoui and L. El Abbadi, ``Integrating human reliability into supplier evaluation: A cross-layer decision-making framework,'' Int. J. Eng. Trends Technol., vol. 73, no. 7, pp. 269--279, 2025, doi: 10.14445/22315381/IJETT-V73I7P12.
+\bibitem{ref69} A. Z. M. Noor et al., ``Fuzzy analytic hierarchy process (FAHP) integration for decision making purposes: A review,'' J. Adv. Manuf. Technol., vol. 12, no. 2, pp. 1--16, 2017. researchgate/FAHP-integration-for-decision-making-purposes
+\bibitem{ref70} C. Harland, R. Brenchley, and H. Walker, ``Risk in supply networks,'' J. Purch. Supply Manag., vol. 9, no. 2, pp. 51--62, 2003, doi: 10.1016/S1478-4092(03)00004-9.
+\bibitem{ref71} M. Kwiesielewicz and E. van Uden, ``Inconsistent and contradictory judgements in pairwise comparison method in the AHP,'' Comput. Oper. Res., vol. 31, no. 5, pp. 713--719, 2004, doi: 10.1016/S0305-0548(03)00022-4.
+\bibitem{ref72} A. Abdulla, G. Baryannis, and I. Badi, ``An integrated machine learning and MARCOS method for supplier evaluation and selection,'' Decis. Anal. J., vol. 9, p. 100342, 2023, doi: 10.1016/j.dajour.2023.100342.
+\bibitem{ref73} H. Kaur and S. P. Singh, ``Multi-stage hybrid model for supplier selection and order allocation considering disruption risks and disruptive technologies,'' Int. J. Prod. Econ., vol. 231, p. 107830, 2021, doi: 10.1016/j.ijpe.2020.107830.
+\bibitem{ref74} F. Firouzi and O. Jadidi, ``Multi-objective model for supplier selection and order allocation problem with fuzzy parameters,'' Expert Syst. Appl., vol. 180, p. 115129, 2021, doi: 10.1016/j.eswa.2021.115129.
+\bibitem{ref75} C. N. Wang, N. A. T. Nguyen, T. T. Dang, and C. M. Lu, ``A compromised decision-making approach to third-party logistics selection in sustainable supply chain using fuzzy AHP and fuzzy VIKOR methods,'' Mathematics, vol. 9, no. 8, p. 886, 2021, doi: 10.3390/math9080886.
+\bibitem{ref76} C. Wu, Y. Jia, and D. Barnes, ``Sustainable partner selection and order allocation for strategic items: An integrated multi-stage decision-making model,'' Int. J. Prod. Res., vol. 61, no. 4, pp. 1076--1100, 2023, doi: 10.1080/00207543.2022.2025945.
+\bibitem{ref77} Z. Yahia, Y. Elsherif, M. Elsehly, Z. Bakr, and O. Abdelghany, ``Framework of Bidirectional Supplier Buyer Matching in Supply Chains Using Blockchain Smart Contracts and Cooperative Game Theory,'' 2025 7th Novel Intelligent and Leading Emerging Sciences Conference (NILES), Giza, Egypt, 2025, pp. 84--89, doi: 10.1109/NILES68063.2025.11232137.
+
+\bibitem{ref78} T. L. Saaty, \textit{The Analytic Hierarchy Process}. New York, NY, USA: McGraw-Hill, 1980.
+\bibitem{ref79} L. A. Zadeh, ``Fuzzy sets,'' Information and Control, vol. 8, no. 3, pp. 338--353, 1965, doi: 10.1016/S0019-9958(65)90241-X.
+\bibitem{ref80} J. J. Buckley, ``Fuzzy hierarchical analysis,'' Fuzzy Sets and Systems, vol. 17, no. 3, pp. 233--247, 1985, doi: 10.1016/0165-0114(85)90090-9.
+\bibitem{ref81} C.-L. Hwang and K. Yoon, \textit{Multiple Attribute Decision Making: Methods and Applications}. Berlin, Germany: Springer-Verlag, 1981.
+\bibitem{ref82} S. Opricovic, ``Multicriteria optimization of civil engineering systems,'' Faculty of Civil Engineering, Belgrade, Tech. Rep., 1998.
+\bibitem{ref83} S. Opricovic and G.-H. Tzeng, ``Compromise solution by MCDM methods: A comparative analysis of VIKOR and TOPSIS,'' Eur. J. Oper. Res., vol. 156, no. 2, pp. 445--455, Jul. 2004, doi: 10.1016/S0377-2217(03)00020-1.
+\end{thebibliography}
+
+\end{document}

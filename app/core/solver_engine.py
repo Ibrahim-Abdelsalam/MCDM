@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 
 from .ahp import AHPSolver
+from .fuzzy_ahp import FuzzyAHPSolver
 from .topsis import TOPSISSolver
 from .vikor import VIKORSolver
 from .weight_manager import WeightSchemeManager
@@ -17,6 +18,7 @@ class MCDMSolverEngine:
         """Initialize the solver engine."""
         self.weight_manager = WeightSchemeManager()
         self.ahp_solver = AHPSolver()
+        self.fuzzy_ahp_solver = FuzzyAHPSolver()
         self.topsis_solver = TOPSISSolver()
         self.vikor_solver = VIKORSolver()
 
@@ -35,7 +37,7 @@ class MCDMSolverEngine:
             entity_type: "supplier" or "buyer"
             scores_df: DataFrame with ID column and criterion score columns
             weight_scheme_names: list of weight scheme names to apply
-            methods: list of method names: "AHP", "TOPSIS", "VIKOR"
+            methods: list of method names: "AHP", "FUZZY_AHP", "TOPSIS", "VIKOR"
             v: VIKOR v parameter (0.0–1.0, default 0.5)
         
         Returns:
@@ -46,7 +48,7 @@ class MCDMSolverEngine:
         if not methods:
             raise ValueError("At least one method must be selected.")
         
-        valid_methods = {"AHP", "TOPSIS", "VIKOR"}
+        valid_methods = {"AHP", "FUZZY_AHP", "TOPSIS", "VIKOR"}
         invalid_methods = set(methods) - valid_methods
         if invalid_methods:
             raise ValueError(f"Unknown methods: {invalid_methods}")
@@ -65,6 +67,11 @@ class MCDMSolverEngine:
                 ahp_result = self.ahp_solver.solve(weight_vector, scores_df)
                 merged_results[f"AHP_{safe_scheme_name}_Score"] = ahp_result["AHP_Score"]
                 merged_results[f"AHP_{safe_scheme_name}_Rank"] = ahp_result["AHP_Rank"]
+
+            if "FUZZY_AHP" in methods:
+                fuzzy_ahp_result = self.fuzzy_ahp_solver.solve(weight_vector, scores_df)
+                merged_results[f"FUZZY_AHP_{safe_scheme_name}_Score"] = fuzzy_ahp_result["FUZZY_AHP_Score"]
+                merged_results[f"FUZZY_AHP_{safe_scheme_name}_Rank"] = fuzzy_ahp_result["FUZZY_AHP_Rank"]
             
             if "TOPSIS" in methods:
                 topsis_result = self.topsis_solver.solve(weight_vector, scores_df)

@@ -1,0 +1,15 @@
+{
+  "scheme_name": "Test",
+  "entity_type": "supplier",
+  "weights": {
+    "Quality Performance": 1.0,
+    "Delivery Performance": 1.2,
+    "Cost Competitiveness": 1.1,
+    "Financial Stability": 1.0,
+    "Technical Capability": 1.1,
+    "Compliance & Sustainability": 0.9,
+    "Systems Integration": 1.1,
+    "Flexibility": 1.0,
+    "Experience & Track Record": 1.0
+  }
+}

@@ -55,13 +55,13 @@ class DatasetGenerator:
         criteria_names = self._criteria_names(normalized_entity_type)
         rng = np.random.default_rng(seed)
 
-        rows: list[dict[str, float | str]] = []
+        rows: list[dict[str, int | str]] = []
         prefix = self._entity_prefix(normalized_entity_type)
         for index in range(1, n + 1):
-            row: dict[str, float | str] = {"ID": f"{prefix}-{index:03d}"}
+            row: dict[str, int | str] = {"ID": f"{prefix}-{index:03d}"}
             for criterion_name in criteria_names:
-                score_value = float(rng.uniform(SCORE_MIN, SCORE_MAX))
-                row[criterion_name] = round(score_value, 2)
+                score_value = int(rng.integers(int(SCORE_MIN), int(SCORE_MAX) + 1))
+                row[criterion_name] = score_value
             rows.append(row)
 
         dataset = pd.DataFrame(rows, columns=["ID", *criteria_names])

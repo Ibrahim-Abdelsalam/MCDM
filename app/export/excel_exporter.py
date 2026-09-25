@@ -16,9 +16,19 @@ from ..config import BASE_DIR
 class ExcelExporter:
     """Export analysis results to formatted Excel workbooks."""
 
+    METHOD_NAMES = ("FUZZY_AHP", "TOPSIS", "VIKOR", "AHP")
+
     def __init__(self, output_dir: Path | None = None) -> None:
         """Initialize the exporter with the output directory."""
         self.output_dir = output_dir or (BASE_DIR / "data" / "results")
+
+    def _split_result_key(self, key: str) -> tuple[str, str]:
+        """Split a "{METHOD}_{SCHEME}" key while supporting method names with underscores."""
+        for method in self.METHOD_NAMES:
+            prefix = f"{method}_"
+            if key.startswith(prefix):
+                return method, key[len(prefix):]
+        return key, ""
 
     def export(
         self,
@@ -85,7 +95,7 @@ class ExcelExporter:
         # Create summary sheet with top 5 from each method-scheme
         summary_data = []
         for key, result_df in analysis_results.items():
-            method, scheme = key.rsplit("_", 1)
+            method, scheme = self._split_result_key(key)
             top_5 = result_df.nsmallest(5, "Rank")
             for _, row in top_5.iterrows():
                 summary_data.append({

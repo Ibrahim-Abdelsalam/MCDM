@@ -1,0 +1,14 @@
+{
+  "scheme_name": "abc",
+  "entity_type": "supplier",
+  "weights": {
+    "Delivery Performance": 0.125,
+    "Cost Competitiveness": 0.125,
+    "Financial Stability": 0.125,
+    "Flexibility": 0.125,
+    "Experience & Track Record": 0.125,
+    "Technical Capability": 0.125,
+    "Systems Integration": 0.125,
+    "Quality Performance": 0.125
+  }
+}

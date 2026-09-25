@@ -101,11 +101,50 @@ class VIKORSolver:
             (1 - v) * (r_scores - r_min) / r_denom
         )
         
+        # Determine compromise solution
+        sorted_indices = np.argsort(q_scores)
+        is_compromise = np.zeros(len(q_scores), dtype=bool)
+        
+        if len(q_scores) > 0:
+            best_idx = sorted_indices[0]
+            
+            # Condition 1: Acceptable Advantage (Q(a'') - Q(a') >= DQ)
+            dq = 1.0 / (len(q_scores) - 1) if len(q_scores) > 1 else 0.0
+            cond1_passed = False
+            if len(q_scores) > 1:
+                second_best_idx = sorted_indices[1]
+                if (q_scores[second_best_idx] - q_scores[best_idx]) >= dq:
+                    cond1_passed = True
+            else:
+                cond1_passed = True
+                
+            # Condition 2: Acceptable Stability (Top Q is also Top S or Top R)
+            best_s_indices = np.where(s_scores == np.min(s_scores))[0]
+            best_r_indices = np.where(r_scores == np.min(r_scores))[0]
+            cond2_passed = (best_idx in best_s_indices) or (best_idx in best_r_indices)
+            
+            if cond1_passed and cond2_passed:
+                is_compromise[best_idx] = True
+            elif cond1_passed and not cond2_passed:
+                is_compromise[best_idx] = True
+                if len(q_scores) > 1:
+                    is_compromise[sorted_indices[1]] = True
+            elif not cond1_passed:
+                # Include alternatives a', a'', ..., a(m) where Q(a(m)) - Q(a') < DQ
+                is_compromise[best_idx] = True
+                for i in range(1, len(q_scores)):
+                    idx = sorted_indices[i]
+                    if (q_scores[idx] - q_scores[best_idx]) < dq:
+                        is_compromise[idx] = True
+                    else:
+                        break
+
         # Invert scores so higher = better (consistent with AHP/TOPSIS)
         final_scores = 1.0 - q_scores
         
         result = scores_df[["ID"]].copy()
         result["VIKOR_Score"] = final_scores
         result["VIKOR_Rank"] = result["VIKOR_Score"].rank(method="min", ascending=False).astype(int)
+        result["Is_Compromise"] = is_compromise
         
         return result.sort_values("VIKOR_Rank")
