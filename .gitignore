@@ -32,3 +32,5 @@ app/data/results/*.csv
 
 # Academic Drafts (Holding Folder)
 Academic_Drafts_and_Notes/
+paper/
+papers/
