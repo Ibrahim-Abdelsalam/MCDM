@@ -25,7 +25,7 @@ class BusinessVarsEngine:
     def _inv(self, val):
         return (val - 1) / 9.0
 
-    def generate_supplier_vars(self, suppliers_df: pd.DataFrame, supplier_ratings: pd.DataFrame) -> pd.DataFrame:
+    def generate_supplier_vars(self, suppliers_df: pd.DataFrame, supplier_ratings: pd.DataFrame, slim: bool = False) -> pd.DataFrame:
         rows = []
         sup_dict = suppliers_df.set_index('entity_id').to_dict('index')
         
@@ -78,9 +78,9 @@ class BusinessVarsEngine:
             q_raw = row.get('Quality Performance', 5.0)
             cert = 'Not certified / lapsed' if q_raw < 4 else 'In progress' if q_raw < 5.5 else 'ISO 9001' if q_raw < 7.5 else 'ISO 9001 + industry standard'
             
-            rows.append({
+            record = {
                 "entity_id": e, "year": y,
-                "defect_rate": round(defect, 4), "first_pass_yield": round(fpy, 4),
+                "defect_rate": round(defect, 4),
                 "on_time_delivery_rate": round(otd, 4), "average_lead_time_days": round(lt, 1),
                 "lead_time_variability_days": round(ltv, 1), "production_capacity_units": int(cap),
                 "MOQ_units": int(moq), "capacity_utilization": round(util, 3),
@@ -89,11 +89,29 @@ class BusinessVarsEngine:
                 "ERP_integration_level": erp, "technical_capability_cpk": round(cpk, 2),
                 "ESG_compliance": round(esg, 1), "HSE_compliance": round(hse, 1),
                 "quality_certification_status": cert
-            })
+            }
+            if not slim:
+                record["first_pass_yield"] = round(fpy, 4)
+            rows.append(record)
             
-        return pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
+        if not slim and "first_pass_yield" in df.columns:
+            # Reorder so first_pass_yield is after defect_rate for backwards compatibility
+            cols = list(df.columns)
+            cols.remove("first_pass_yield")
+            defect_idx = cols.index("defect_rate")
+            cols.insert(defect_idx + 1, "first_pass_yield")
+            df = df[cols]
+        return df
 
-    def generate_buyer_vars(self, buyers_df: pd.DataFrame, buyer_ratings: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def to_slim_supplier_vars(df: pd.DataFrame) -> pd.DataFrame:
+        """Filter out redundant first_pass_yield and years_experience."""
+        drop_cols = ["first_pass_yield", "years_experience"]
+        return df.drop(columns=[c for c in drop_cols if c in df.columns]).copy()
+
+
+    def generate_buyer_vars(self, buyers_df: pd.DataFrame, buyer_ratings: pd.DataFrame, slim: bool = False) -> pd.DataFrame:
         rows = []
         buy_dict = buyers_df.set_index('entity_id').to_dict('index')
         
@@ -128,11 +146,11 @@ class BusinessVarsEngine:
             
             comp = row.get('Compliance & Regulatory Standards', 5.0)
             
-            rows.append({
+            record = {
                 "entity_id": e, "year": y,
                 "annual_order_volume_usd": int(rev * 1e6 * (0.03 + 0.10 * svol)),
                 "order_frequency_per_year": int(self.FREQ_MULTS.get(size, 52) * (0.6 + 0.8 * sdem)),
-                "forecast_accuracy": round(fa, 3), "forecast_error": round(1 - fa, 3),
+                "forecast_accuracy": round(fa, 3),
                 "average_payment_days": round(self.PAY_TERMS.get(ind, 45) + delay, 1),
                 "payment_delay_days": round(delay, 1),
                 "credit_limit_usd": int(rev * 1e6 * (0.02 + 0.06 * sfin)),
@@ -143,7 +161,24 @@ class BusinessVarsEngine:
                 "ERP_integration_level": int(np.clip(round(row.get('Technical Sophistication (Systems)', 5.0) / 2.5), 0, 4)),
                 "compliance_status": 'Non-compliant' if comp < 4 else 'Minor findings' if comp < 6.5 else 'Compliant',
                 "reputation_score": round(float(np.clip(100 * self._inv(row.get('Market Reputation & Brand Impact', 5.0)), 0, 100)), 1)
-            })
+            }
+            if not slim:
+                record["forecast_error"] = round(1 - fa, 3)
+            rows.append(record)
             
-        return pd.DataFrame(rows)
+        df = pd.DataFrame(rows)
+        if not slim and "forecast_error" in df.columns:
+            # Reorder so forecast_error is immediately after forecast_accuracy
+            cols = list(df.columns)
+            cols.remove("forecast_error")
+            acc_idx = cols.index("forecast_accuracy")
+            cols.insert(acc_idx + 1, "forecast_error")
+            df = df[cols]
+        return df
+
+    @staticmethod
+    def to_slim_buyer_vars(df: pd.DataFrame) -> pd.DataFrame:
+        """Filter out redundant forecast_error."""
+        return df.drop(columns=[c for c in ["forecast_error"] if c in df.columns]).copy()
+
 

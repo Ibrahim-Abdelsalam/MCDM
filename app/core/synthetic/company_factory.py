@@ -139,3 +139,18 @@ class CompanyFactory:
         df = pd.DataFrame(records)
         df['deactivation_year'] = df['deactivation_year'].astype('Int64')
         return df
+
+    @staticmethod
+    def to_slim(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Produce slim public entity DataFrame by filtering out hidden latent factors
+        and redundant firmographic columns.
+        """
+        slim_cols = [
+            "entity_id", "industry", "country", "company_size",
+            "strategic_segment", "risk_segment", "creation_year",
+            "active_status", "deactivation_year"
+        ]
+        available_cols = [c for c in slim_cols if c in df.columns]
+        return df[available_cols].copy()
+

@@ -227,3 +227,33 @@ class RatingEngine:
         yearly_df["normalized_rating"] = yearly_df["normalized_rating"].round(4)
         
         return yearly_df
+
+    @staticmethod
+    def extract_qualification(yearly_ratings_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Extract a de-normalized qualification table with one row per entity-year.
+        """
+        if yearly_ratings_df.empty or "is_qualified" not in yearly_ratings_df.columns:
+            return pd.DataFrame(columns=["entity_id", "year", "is_qualified"])
+        qual_df = yearly_ratings_df.groupby(["entity_id", "year"], as_index=False)["is_qualified"].first()
+        return qual_df.sort_values(["entity_id", "year"]).reset_index(drop=True)
+
+    @staticmethod
+    def to_slim_ratings(yearly_ratings_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Produce slim ratings table removing redundant columns:
+        rating_scale, normalized_rating, data_source, is_qualified.
+        """
+        slim_cols = ["entity_id", "year", "criterion", "scenario_id", "raw_value", "gate_status"]
+        available = [c for c in slim_cols if c in yearly_ratings_df.columns]
+        return yearly_ratings_df[available].copy()
+
+    @staticmethod
+    def to_slim_events(events_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Produce slim events log removing raw_value_shift / impact_magnitude_original.
+        """
+        slim_cols = ["entity_id", "year", "event_type", "impact_magnitude", "affected_criterion"]
+        available = [c for c in slim_cols if c in events_df.columns]
+        return events_df[available].copy()
+

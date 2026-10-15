@@ -59,26 +59,44 @@ class AHPSolver:
         Derive weights using Buckley's method.
         
         Args:
-            pairwise_df: DataFrame containing a single pairwise matrix in long format.
-                         Columns: criterion_i, criterion_j, lower, middle, upper
+            pairwise_df: DataFrame containing a pairwise matrix in long format.
+                         Columns: criterion_i, criterion_j, lower/middle/upper (or l/m/u)
+                         Can be full matrix or upper-triangle only.
                          
         Returns:
             dict mapping criterion name to normalized crisp weight.
         """
-        crits = pairwise_df["criterion_i"].unique()
+        l_col = "l" if "l" in pairwise_df.columns else "lower"
+        m_col = "m" if "m" in pairwise_df.columns else "middle"
+        u_col = "u" if "u" in pairwise_df.columns else "upper"
+        has_tfn = l_col in pairwise_df.columns and m_col in pairwise_df.columns and u_col in pairwise_df.columns
+        
+        crits = list(pd.concat([pairwise_df["criterion_i"], pairwise_df["criterion_j"]]).unique())
         n = len(crits)
         c_idx = {c: i for i, c in enumerate(crits)}
         
-        A_l = np.zeros((n, n))
-        A_m = np.zeros((n, n))
-        A_u = np.zeros((n, n))
+        A_l = np.ones((n, n))
+        A_m = np.ones((n, n))
+        A_u = np.ones((n, n))
         
         for _, row in pairwise_df.iterrows():
             i, j = c_idx[row["criterion_i"]], c_idx[row["criterion_j"]]
-            A_l[i, j] = row["lower"]
-            A_m[i, j] = row["middle"]
-            A_u[i, j] = row["upper"]
+            if has_tfn:
+                l_val, m_val, u_val = float(row[l_col]), float(row[m_col]), float(row[u_col])
+            else:
+                comp = float(row["comparison_value"])
+                l_val, m_val, u_val = comp, comp, comp
+                
+            A_l[i, j] = l_val
+            A_m[i, j] = m_val
+            A_u[i, j] = u_val
             
+            # Reciprocal reconstruction for lower triangle
+            if i != j:
+                A_l[j, i] = 1.0 / u_val
+                A_m[j, i] = 1.0 / m_val
+                A_u[j, i] = 1.0 / l_val
+                
         r_l = np.prod(A_l, axis=1) ** (1.0 / n)
         r_m = np.prod(A_m, axis=1) ** (1.0 / n)
         r_u = np.prod(A_u, axis=1) ** (1.0 / n)
@@ -94,3 +112,4 @@ class AHPSolver:
         w_norm = w_crisp / np.sum(w_crisp)
         
         return {c: float(w_norm[i]) for i, c in enumerate(crits)}
+

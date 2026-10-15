@@ -1023,3 +1023,152 @@ COMPANY_NAME_LEGAL_FORMS: list[str] = [
     "Ltd.", "GmbH", "S.A.", "Corp.", "Inc.", "LLC", "AG", "B.V.",
     "Pty Ltd.", "S.r.l.", "Co., Ltd.", "PLC",
 ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 13 · FUZZY AHP & SLIM PLATFORM METADATA SPECIFICATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FUZZY_CONFIDENCE_RULES: list[dict[str, object]] = [
+    {
+        "confidence": "High",
+        "half_width_on_saaty_scale": 0.5,
+        "meaning": "Expert is sure: narrow range around the stated value",
+        "example_for_stated_value_3": "(2.5, 3, 3.5)",
+        "rule": "l = max(1, k - w), u = min(9, k + w) for k >= 1 (k = stated value, or its inverse for k < 1, then re-inverted); for k = 1: (1/(1+w), 1, 1+w)",
+    },
+    {
+        "confidence": "Medium",
+        "half_width_on_saaty_scale": 1.0,
+        "meaning": "Expert is fairly sure",
+        "example_for_stated_value_3": "(2, 3, 4)",
+        "rule": "l = max(1, k - w), u = min(9, k + w) for k >= 1 (k = stated value, or its inverse for k < 1, then re-inverted); for k = 1: (1/(1+w), 1, 1+w)",
+    },
+    {
+        "confidence": "Low",
+        "half_width_on_saaty_scale": 2.0,
+        "meaning": "Expert is unsure or gave a rough judgment: wide range",
+        "example_for_stated_value_3": "(1, 3, 5)",
+        "rule": "l = max(1, k - w), u = min(9, k + w) for k >= 1 (k = stated value, or its inverse for k < 1, then re-inverted); for k = 1: (1/(1+w), 1, 1+w)",
+    },
+]
+
+def compute_fuzzy_tfn(k: float, confidence: str) -> tuple[float, float, float]:
+    """
+    Compute Triangular Fuzzy Number (l, m, u) for a crisp Saaty comparison value.
+    Supports k >= 1 and reciprocal values k < 1.
+    """
+    w = 0.5 if confidence == "High" else (1.0 if confidence == "Medium" else 2.0)
+    if abs(k - 1.0) < 1e-6:
+        l = round(1.0 / (1.0 + w), 4)
+        m = 1.0
+        u = round(1.0 + w, 4)
+        return l, m, u
+    elif k > 1.0:
+        l = round(max(1.0, k - w), 4)
+        m = round(float(k), 4)
+        u = round(min(9.0, k + w), 4)
+        return l, m, u
+    else:
+        inv_k = round(1.0 / k)
+        l_inv = max(1.0, inv_k - w)
+        u_inv = min(9.0, inv_k + w)
+        l = round(1.0 / u_inv, 4)
+        m = round(float(k), 4)
+        u = round(1.0 / l_inv, 4)
+        return l, m, u
+
+CRITERIA_METADATA: list[dict[str, str]] = [
+    {"entity_type": "supplier", "criterion": "Compliance and Sustainability", "direction": "benefit (higher raw is better)", "qualification_gate": "yes (fail if raw < 4.0)"},
+    {"entity_type": "supplier", "criterion": "Cost / Price Competitiveness", "direction": "cost (lower raw is better)", "qualification_gate": "no"},
+    {"entity_type": "supplier", "criterion": "Delivery Performance", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "supplier", "criterion": "Experience and Track Record", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "supplier", "criterion": "Financial Stability", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "supplier", "criterion": "Flexibility", "direction": "benefit (higher raw is better)", "qualification_gate": "yes (fail if raw < 4.0)"},
+    {"entity_type": "supplier", "criterion": "Quality Performance", "direction": "benefit (higher raw is better)", "qualification_gate": "yes (fail if raw < 4.0)"},
+    {"entity_type": "supplier", "criterion": "Systems Integration", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "supplier", "criterion": "Technical Capability / Process Capability", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Compliance & Regulatory Standards", "direction": "benefit (higher raw is better)", "qualification_gate": "yes (fail if raw < 4.0)"},
+    {"entity_type": "buyer", "criterion": "Demand Stability & Predictability", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Financial Stability & Creditworthiness", "direction": "benefit (higher raw is better)", "qualification_gate": "yes (fail if raw < 4.0)"},
+    {"entity_type": "buyer", "criterion": "Long-Term Strategic Value", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Market Reputation & Brand Impact", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Order Volume & Growth Potential", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Payment Performance", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Responsiveness & Collaboration", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+    {"entity_type": "buyer", "criterion": "Technical Sophistication (Systems)", "direction": "benefit (higher raw is better)", "qualification_gate": "no"},
+]
+
+PLATFORM_NOTES: list[str] = [
+    "Inputs only: no TOPSIS/VIKOR/Fuzzy AHP outputs. The platform computes them; generate ML labels by running the platform on this data.",
+    "Ratings: raw_value is on a 1-10 scale. Use the Criteria sheet for direction (benefit/cost) and qualification gate. normalized = (raw-1)/9 for benefit, (10-raw)/9 for cost.",
+    "Qualification: one row per entity-year; an entity-year is disqualified if any gated criterion has raw < 4.0.",
+    "AHP_Pairwise: upper triangle only, in the criterion order of each matrix. Rebuild with a_ji = 1/a_ij and a_ii = 1.",
+    "AHP_Weights and AHP_Consistency are reference values computed from the matrices (principal eigenvector); the platform should recompute them.",
+    "Expert lookup: join expert_id to Experts for industry, role, entity_type.",
+    "ML: split train/test by entity_id (GroupKFold). Years are near-copies of each other (autocorrelation ~0.99), so random row splits leak.",
+    "ML: industry and company_size strongly drive ratings; report results per industry or include them deliberately as features.",
+    "Latent generator variables and expert noise are NOT in this file; see the docs file. Never use them as features.",
+    "AHP_Pairwise_Fuzzy: same comparisons as AHP_Pairwise, stored as triangular fuzzy numbers (l, m, u). m equals the stated crisp value; l and u widen when the expert is less sure (confidence column). Lower triangle: (1/u, 1/m, 1/l).",
+    "Fuzzy_Rules: how confidence maps to the width of the range. Confidence was GENERATED (synthetic): experts with less experience and higher noise are more often Medium/Low. In production it would come from the expert (e.g. a confidence selector next to each comparison).",
+]
+
+REMOVED_COLUMNS_AUDIT: list[dict[str, str]] = [
+    {"sheet": "Suppliers", "column_or_rows": "operational_capability", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Suppliers", "column_or_rows": "business_maturity", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Suppliers", "column_or_rows": "compliance_posture", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Suppliers", "column_or_rows": "commercial_competitiveness", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Buyers", "column_or_rows": "financial_health", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Buyers", "column_or_rows": "operational_maturity", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Buyers", "column_or_rows": "strategic_positioning", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Buyers", "column_or_rows": "compliance_culture", "reason": "Hidden generator variable (latent). The platform will never know it; keep out of every ML feature set."},
+    {"sheet": "Suppliers", "column_or_rows": "company_name", "reason": "Free-text label, no analytical value."},
+    {"sheet": "Buyers", "column_or_rows": "company_name", "reason": "Free-text label, no analytical value."},
+    {"sheet": "Suppliers", "column_or_rows": "entity_type", "reason": "Constant (always \"supplier\"); the entity_id prefix already says it."},
+    {"sheet": "Buyers", "column_or_rows": "entity_type", "reason": "Constant (always \"buyer\"); the entity_id prefix already says it."},
+    {"sheet": "Suppliers", "column_or_rows": "region", "reason": "Fully determined by country."},
+    {"sheet": "Buyers", "column_or_rows": "region", "reason": "Fully determined by country."},
+    {"sheet": "Suppliers", "column_or_rows": "annual_revenue_band", "reason": "Same information as company_size (size band maps 1:1 to revenue band; employees are a size proxy). company_size kept."},
+    {"sheet": "Suppliers", "column_or_rows": "employee_count", "reason": "Same information as company_size (size band maps 1:1 to revenue band; employees are a size proxy). company_size kept."},
+    {"sheet": "Buyers", "column_or_rows": "annual_revenue_band", "reason": "Same information as company_size (size band maps 1:1 to revenue band; employees are a size proxy). company_size kept."},
+    {"sheet": "Buyers", "column_or_rows": "employee_count", "reason": "Same information as company_size (size band maps 1:1 to revenue band; employees are a size proxy). company_size kept."},
+    {"sheet": "Suppliers", "column_or_rows": "years_in_operation", "reason": "Equals 2018 - creation_year (stale reference year). creation_year kept."},
+    {"sheet": "Buyers", "column_or_rows": "years_in_operation", "reason": "Equals 2018 - creation_year (stale reference year). creation_year kept."},
+    {"sheet": "Supplier_Ratings", "column_or_rows": "rating_scale", "reason": "Constant (\"1-10\")."},
+    {"sheet": "Supplier_Ratings", "column_or_rows": "normalized_rating", "reason": "Exact linear function of raw_value (cost criteria inverted); recompute in the system using the Criteria sheet direction."},
+    {"sheet": "Supplier_Ratings", "column_or_rows": "data_source", "reason": "No effect on ratings (mean rating is the same across all sources), so it adds nothing."},
+    {"sheet": "Supplier_Ratings", "column_or_rows": "is_qualified", "reason": "Repeated on all 9 criterion rows; moved to the Qualification sheet (one row per entity-year)."},
+    {"sheet": "Buyer_Ratings", "column_or_rows": "rating_scale", "reason": "Constant (\"1-10\")."},
+    {"sheet": "Buyer_Ratings", "column_or_rows": "normalized_rating", "reason": "Exact linear function of raw_value (cost criteria inverted); recompute in the system using the Criteria sheet direction."},
+    {"sheet": "Buyer_Ratings", "column_or_rows": "data_source", "reason": "No effect on ratings (mean rating is the same across all sources), so it adds nothing."},
+    {"sheet": "Buyer_Ratings", "column_or_rows": "is_qualified", "reason": "Repeated on all 9 criterion rows; moved to the Qualification sheet (one row per entity-year)."},
+    {"sheet": "Events_Log", "column_or_rows": "impact_magnitude_original", "reason": "Audit leftover (value before the sign correction)."},
+    {"sheet": "Events_Log", "column_or_rows": "raw_value_shift", "reason": "Same as impact_magnitude except sign inversion for cost criteria; derivable using the Criteria sheet."},
+    {"sheet": "AHP_Pairwise", "column_or_rows": "industry", "reason": "Lookup attribute; available in Experts (join on expert_id)."},
+    {"sheet": "AHP_Pairwise", "column_or_rows": "role", "reason": "Lookup attribute; available in Experts (join on expert_id)."},
+    {"sheet": "AHP_Pairwise", "column_or_rows": "entity_type", "reason": "Lookup attribute; available in Experts (join on expert_id)."},
+    {"sheet": "AHP_Pairwise", "column_or_rows": "(rows)", "reason": "Lower triangle and diagonal removed: 36 independent comparisons per matrix instead of 81. Rebuild the full matrix as a_ji = 1/a_ij, a_ii = 1."},
+    {"sheet": "AHP_Weights", "column_or_rows": "industry", "reason": "Lookup attribute; available in Experts."},
+    {"sheet": "AHP_Weights", "column_or_rows": "role", "reason": "Lookup attribute; available in Experts."},
+    {"sheet": "AHP_Weights", "column_or_rows": "entity_type", "reason": "Lookup attribute; available in Experts."},
+    {"sheet": "AHP_Weights", "column_or_rows": "lambda_max", "reason": "Identical on all 9 rows of an expert-year; moved to AHP_Consistency (one row per expert-year)."},
+    {"sheet": "AHP_Weights", "column_or_rows": "CI", "reason": "Identical on all 9 rows of an expert-year; moved to AHP_Consistency (one row per expert-year)."},
+    {"sheet": "AHP_Weights", "column_or_rows": "RI", "reason": "Identical on all 9 rows of an expert-year; moved to AHP_Consistency (one row per expert-year)."},
+    {"sheet": "AHP_Weights", "column_or_rows": "CR", "reason": "Identical on all 9 rows of an expert-year; moved to AHP_Consistency (one row per expert-year)."},
+    {"sheet": "AHP_Weights", "column_or_rows": "consistency_status", "reason": "Constant (\"consistent\")."},
+    {"sheet": "AHP_Weights", "column_or_rows": "original_cr", "reason": "Generator repair bookkeeping; not meaningful for the platform."},
+    {"sheet": "AHP_Weights", "column_or_rows": "repaired", "reason": "Generator repair bookkeeping; not meaningful for the platform."},
+    {"sheet": "AHP_Weights", "column_or_rows": "repair_iterations", "reason": "Generator repair bookkeeping; not meaningful for the platform."},
+    {"sheet": "AHP_Weights", "column_or_rows": "target_band", "reason": "Generator repair bookkeeping; not meaningful for the platform."},
+    {"sheet": "AHP_Weights", "column_or_rows": "final_band", "reason": "Generator repair bookkeeping; not meaningful for the platform."},
+    {"sheet": "Experts", "column_or_rows": "judgment_noise", "reason": "Generator parameter (simulation noise); does not correlate with CR and the platform will not have it."},
+    {"sheet": "Supplier_Business_Vars", "column_or_rows": "years_experience", "reason": "Equals year - creation_year exactly."},
+    {"sheet": "Supplier_Business_Vars", "column_or_rows": "first_pass_yield", "reason": "Almost exactly 1 - defect_rate (r = -0.99). defect_rate kept."},
+    {"sheet": "Buyer_Business_Vars", "column_or_rows": "forecast_error", "reason": "Exactly 1 - forecast_accuracy. forecast_accuracy kept."},
+    {"sheet": "Weights_Comparison", "column_or_rows": "(whole sheet)", "reason": "Derived from Direct_Weights and AHP_Weights; the platform can compute it on demand. Saved in the docs file."},
+    {"sheet": "Metadata", "column_or_rows": "(whole sheet)", "reason": "Documentation, not data. Saved in the docs file."},
+    {"sheet": "Validation", "column_or_rows": "(whole sheet)", "reason": "Documentation, not data. Saved in the docs file."},
+    {"sheet": "Change_Log", "column_or_rows": "(whole sheet)", "reason": "Documentation, not data. Saved in the docs file."},
+    {"sheet": "Supplier_Business_Vars / Buyer_Business_Vars", "column_or_rows": "production_capacity_units, MOQ_units, annual_order_volume_usd, credit_limit_usd, revenue_usd_m", "reason": "NOT removed. Heavily skewed (max 71M): apply log transform in the ML preprocessing step, not in the data."},
+]
+

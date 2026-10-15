@@ -272,3 +272,188 @@ class AHPGenerator:
         df_ahp_weights = pd.DataFrame(ahp_weights)
         
         return df_direct, df_matrices, df_ahp_weights
+
+    def generate_experts(self) -> pd.DataFrame:
+        """
+        Generates a longitudinal panel of 70 domain experts across 7 industries
+        and 2 entity evaluation perspectives with realistic years of experience.
+        """
+        experts = []
+        counter = 1
+        for ind in config.INDUSTRY_NAMES:
+            # Supplier evaluation experts (organization_type = Buyer)
+            for role in config.SUPPLIER_EVAL_ROLE_NAMES:
+                exp_years = int(self.rng.integers(4, 26))
+                experts.append({
+                    "expert_id": f"EXP-{counter:05d}",
+                    "industry": ind,
+                    "organization_type": "Buyer",
+                    "role": role,
+                    "entity_type": "supplier",
+                    "years_of_experience": exp_years
+                })
+                counter += 1
+                
+            # Buyer evaluation experts (organization_type = Supplier)
+            for role in config.BUYER_EVAL_ROLE_NAMES:
+                exp_years = int(self.rng.integers(4, 26))
+                experts.append({
+                    "expert_id": f"EXP-{counter:05d}",
+                    "industry": ind,
+                    "organization_type": "Supplier",
+                    "role": role,
+                    "entity_type": "buyer",
+                    "years_of_experience": exp_years
+                })
+                counter += 1
+                
+        return pd.DataFrame(experts)
+
+    def generate_slim(
+        self,
+        years: list[int] | None = None,
+        experts_df: pd.DataFrame | None = None,
+    ) -> dict[str, pd.DataFrame]:
+        """
+        Generates longitudinal expert evaluations matching the slim platform architecture:
+        - Experts lookup table
+        - Direct Weights (11 cols)
+        - Upper-triangle AHP Pairwise (6 cols)
+        - Upper-triangle AHP Pairwise Fuzzy with TFNs (9 cols)
+        - Fuzzy Rules reference table
+        - Slim AHP Weights (5 cols)
+        - De-normalized AHP Consistency table (7 cols)
+        """
+        if experts_df is None:
+            experts_df = self.generate_experts()
+            
+        eval_years = years or list(range(config.DEFAULT_YEAR_START, config.DEFAULT_YEAR_END + 1))
+        
+        direct_weights = []
+        ahp_pairwise = []
+        ahp_pairwise_fuzzy = []
+        ahp_weights = []
+        ahp_consistency = []
+        
+        for year in eval_years:
+            for _, expert in experts_df.iterrows():
+                expert_id = expert["expert_id"]
+                industry = expert["industry"]
+                org_type = expert["organization_type"]
+                role = expert["role"]
+                entity_type = expert["entity_type"]
+                exp_years = expert["years_of_experience"]
+                
+                scenario_id = f"SCN-{year}-{industry[:3].upper()}"
+                criteria_list = config.SUPPLIER_CRITERIA if entity_type == "supplier" else config.BUYER_CRITERIA
+                criteria_names = [c["name"] for c in criteria_list]
+                industry_profile = config.INDUSTRY_PROFILES[industry]
+                tendencies = industry_profile[f"{entity_type}_weight_tendencies"]
+                roles_dict = config.SUPPLIER_EVAL_ROLES if entity_type == "supplier" else config.BUYER_EVAL_ROLES
+                role_biases = roles_dict[role]["weight_biases"]
+                
+                ideal_priorities = []
+                raw_direct_scores = []
+                for crit in criteria_names:
+                    mean, std = tendencies[crit]
+                    bias = role_biases.get(crit, 0.0)
+                    true_score = self.rng.normal(mean + bias, std)
+                    true_score = np.clip(true_score, 1.0, 10.0)
+                    ideal_priorities.append(true_score)
+                    direct_wt = int(round(true_score))
+                    raw_direct_scores.append(direct_wt)
+                    
+                sum_direct = sum(raw_direct_scores)
+                for i, crit in enumerate(criteria_names):
+                    d_val = raw_direct_scores[i]
+                    direct_weights.append({
+                        "expert_id": expert_id,
+                        "industry": industry,
+                        "organization_type": org_type,
+                        "role": role,
+                        "entity_type": entity_type,
+                        "scenario_id": scenario_id,
+                        "year": year,
+                        "criterion": crit,
+                        "direct_weight": d_val,
+                        "interpretation": config.get_weight_interpretation(d_val),
+                        "normalized_weight": round(d_val / sum_direct, 4)
+                    })
+                    
+                bands = list(config.DEFAULT_CR_DISTRIBUTION.keys())
+                probs = list(config.DEFAULT_CR_DISTRIBUTION.values())
+                target_band = self.rng.choice(bands, p=probs)
+                min_cr, max_cr = config.CR_BANDS[target_band]
+                
+                ideal_array = np.array(ideal_priorities)
+                ahp_result = self._generate_pairwise_matrix(ideal_array, min_cr, max_cr)
+                matrix_tfn = ahp_result["matrix_tfn"]
+                matrix_defuzz = ahp_result["matrix_defuzz"]
+                w, l_max, ci, cr = self._compute_ahp_metrics(matrix_defuzz)
+                
+                ahp_consistency.append({
+                    "expert_id": expert_id,
+                    "scenario_id": scenario_id,
+                    "year": year,
+                    "lambda_max": round(l_max, 4),
+                    "CI": round(ci, 4),
+                    "RI": config.SAATY_RI.get(len(criteria_names), 1.45),
+                    "CR": round(cr, 4)
+                })
+                
+                for i, crit in enumerate(criteria_names):
+                    ahp_weights.append({
+                        "expert_id": expert_id,
+                        "scenario_id": scenario_id,
+                        "year": year,
+                        "criterion": crit,
+                        "ahp_weight": float(w[i])
+                    })
+                    
+                n = len(criteria_names)
+                for i in range(n):
+                    for j in range(i + 1, n):
+                        _, m_tfn, _ = matrix_tfn[i][j]
+                        comp_val = round(m_tfn, 4) if m_tfn < 1.0 else int(round(m_tfn))
+                        
+                        ahp_pairwise.append({
+                            "expert_id": expert_id,
+                            "scenario_id": scenario_id,
+                            "year": year,
+                            "criterion_i": criteria_names[i],
+                            "criterion_j": criteria_names[j],
+                            "comparison_value": comp_val
+                        })
+                        
+                        p_high = float(np.clip(0.30 + 0.20 * (exp_years - 4) / 21.0, 0.2, 0.6))
+                        p_low = float(np.clip(0.30 - 0.15 * (exp_years - 4) / 21.0, 0.1, 0.4))
+                        p_med = max(0.0, 1.0 - p_high - p_low)
+                        probs = np.array([p_high, p_med, p_low], dtype=float)
+                        probs = probs / probs.sum()
+                        conf = self.rng.choice(["High", "Medium", "Low"], p=probs)
+                        
+                        l_fuzz, m_fuzz, u_fuzz = config.compute_fuzzy_tfn(comp_val, conf)
+                        ahp_pairwise_fuzzy.append({
+                            "expert_id": expert_id,
+                            "scenario_id": scenario_id,
+                            "year": year,
+                            "criterion_i": criteria_names[i],
+                            "criterion_j": criteria_names[j],
+                            "confidence": conf,
+                            "l": l_fuzz,
+                            "m": m_fuzz,
+                            "u": u_fuzz
+                        })
+                        
+        fuzzy_rules_df = pd.DataFrame(config.FUZZY_CONFIDENCE_RULES)
+        
+        return {
+            "Experts": experts_df,
+            "Direct_Weights": pd.DataFrame(direct_weights),
+            "AHP_Pairwise": pd.DataFrame(ahp_pairwise),
+            "AHP_Pairwise_Fuzzy": pd.DataFrame(ahp_pairwise_fuzzy),
+            "Fuzzy_Rules": fuzzy_rules_df,
+            "AHP_Weights": pd.DataFrame(ahp_weights),
+            "AHP_Consistency": pd.DataFrame(ahp_consistency),
+        }
+

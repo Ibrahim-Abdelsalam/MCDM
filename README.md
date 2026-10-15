@@ -110,6 +110,26 @@ results = engine.run_analysis(
 )
 ```
 
+### Synthetic Platform Dataset Generator (19-Sheet Schema)
+
+Generate the complete multi-tier, modular synthetic platform dataset matching `syn_data_slim.xlsx`:
+
+```bash
+# Generate complete 19-sheet platform dataset with 100 suppliers & 25 buyers across 2018-2023
+python generate_platform_dataset.py --suppliers 100 --buyers 25 --start-year 2018 --end-year 2023 --output-excel datasets/syn_data_platform.xlsx
+
+# Optionally export individual CSV files:
+python generate_platform_dataset.py --output-csv-dir datasets/csv_export/
+```
+
+Features included:
+- **19 Canonical Sheets**: `Notes`, `Removed_Columns`, `Criteria`, `Suppliers`, `Buyers`, `Supplier_Ratings`, `Buyer_Ratings`, `Qualification`, `Events_Log`, `Experts`, `Direct_Weights`, `AHP_Pairwise`, `AHP_Pairwise_Fuzzy`, `Fuzzy_Rules`, `AHP_Weights`, `AHP_Consistency`, `Supplier_Business_Vars`, `Buyer_Business_Vars`, `Relationships`.
+- **Upper-Triangle AHP Storage**: 36 non-redundant pairs per matrix ($a_{ji} = 1/a_{ij}$, $a_{ii} = 1$).
+- **Fuzzy AHP with TFNs**: Triangular Fuzzy Numbers (`l`, `m`, `u`) derived from confidence tiers (`High`, `Medium`, `Low`).
+- **De-normalized Qualification & Consistency**: Dedicated sheets eliminating repeated row blocks.
+- **Strict Consistency Check**: Verifies Saaty consistency ratio $CR \le 0.10$ across all 420 longitudinal expert evaluation matrices.
+
+
 ## Evaluation Criteria
 
 ### Supplier Criteria (9 factors)
