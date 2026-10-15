@@ -40,8 +40,8 @@ class VIKORSolver:
         
         # Get all criteria info
         all_criteria = {
-            **CriteriaConfig.SUPPLIER_CRITERIA,
-            **CriteriaConfig.BUYER_CRITERIA,
+            **CriteriaConfig.get_all_criteria("supplier"),
+            **CriteriaConfig.get_all_criteria("buyer"),
         }
         
         # Prepare criterion names and data

@@ -1,0 +1,291 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+\definecolor{critred}{HTML}{DC3545}
+\definecolor{warnyellow}{HTML}{FFC107}
+\definecolor{okgreen}{HTML}{28A745}
+\definecolor{lightgray}{HTML}{F5F5F5}
+
+\title{\textbf{Exhaustive Data Quality Audit Report}\\
+\large Synthetic Dataset: \texttt{example\_synthetic\_data.xlsx}}
+\author{Data Quality Analysis}
+\date{2026-09-29}
+
+\begin{document}
+
+\maketitle
+
+\noindent\textbf{Scope:} Content-only review across all 10 sheets. No structural changes (columns, formatting, schema, or organization) recommended.
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{\textcolor{critred}{Critical Issues}}
+
+\subsection*{1. Backwards Dates --- 7 rows}
+\textbf{Sheet:} \texttt{Relationships}\\
+\textbf{Problem:} 7 terminated relationships have \texttt{end\_date} \textbf{before} \texttt{start\_date}, resulting in negative durations (e.g., $-178$ days). This is physically impossible.
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{relationship\_id} & \textbf{start\_date} & \textbf{end\_date} & \textbf{Duration} \\
+\midrule
+REL-000041 & 2018-05-15 & 2018-02-09 & \textcolor{critred}{$-95$ days} \\
+REL-000111 & 2018-10-15 & 2018-06-24 & \textcolor{critred}{$-113$ days} \\
+REL-000115 & 2018-09-18 & 2018-03-24 & \textcolor{critred}{$-178$ days} \\
+REL-000161 & 2018-04-23 & 2018-03-11 & \textcolor{critred}{$-43$ days} \\
+REL-000288 & 2018-11-29 & 2018-08-27 & \textcolor{critred}{$-94$ days} \\
+REL-000290 & 2018-01-26 & 2018-01-17 & \textcolor{critred}{$-9$ days} \\
+REL-000298 & 2018-07-19 & 2018-06-29 & \textcolor{critred}{$-20$ days} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Swap \texttt{start\_date} and \texttt{end\_date} for each of these 7 rows, or regenerate the \texttt{end\_date} to be after the \texttt{start\_date}.
+
+\bigskip
+
+\subsection*{2. Negative Events with Positive Impact --- 55 rows}
+\textbf{Sheet:} \texttt{Events\_Log}\\
+\textbf{Problem:} 55 events that are inherently harmful (e.g., \texttt{quality\_incident}, \texttt{financial\_downturn}, \texttt{regulatory\_penalty}, \texttt{supply\_disruption}) have a \textbf{positive} \texttt{impact\_magnitude}, meaning they \emph{improve} the affected criterion score. This is logically backwards.
+
+\begin{center}
+\begin{tabular}{llrl}
+\toprule
+\textbf{entity\_id} & \textbf{event\_type} & \textbf{impact\_mag.} & \textbf{affected\_criterion} \\
+\midrule
+SUP-00001 & quality\_incident & \textcolor{critred}{+1.39} & Compliance and Sustainability \\
+SUP-00010 & regulatory\_penalty & \textcolor{critred}{+0.51} & Technical Capability \\
+SUP-00010 & financial\_downturn & \textcolor{critred}{+0.07} & Technical Capability \\
+SUP-00013 & quality\_incident & \textcolor{critred}{+0.58} & Experience and Track Record \\
+\multicolumn{4}{c}{\emph{(+ 51 more rows)}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Flip the sign of \texttt{impact\_magnitude} to negative for all rows where a harmful event has a positive impact.
+
+\bigskip
+
+\subsection*{3. Positive Events with Negative Impact --- 43 rows}
+\textbf{Sheet:} \texttt{Events\_Log}\\
+\textbf{Problem:} 43 events that are inherently beneficial (e.g., \texttt{market\_expansion}, \texttt{technology\_upgrade}, \texttt{capacity\_expansion}, \texttt{new\_certification}) have a \textbf{negative} \texttt{impact\_magnitude}, meaning they \emph{reduce} the affected criterion score.
+
+\begin{center}
+\begin{tabular}{llrl}
+\toprule
+\textbf{entity\_id} & \textbf{event\_type} & \textbf{impact\_mag.} & \textbf{affected\_criterion} \\
+\midrule
+SUP-00007 & market\_expansion & \textcolor{critred}{$-1.25$} & Delivery Performance \\
+SUP-00008 & technology\_upgrade & \textcolor{critred}{$-0.98$} & Financial Stability \\
+SUP-00011 & market\_expansion & \textcolor{critred}{$-1.18$} & Delivery Performance \\
+SUP-00014 & technology\_upgrade & \textcolor{critred}{$-0.58$} & Technical Capability \\
+\multicolumn{4}{c}{\emph{(+ 39 more rows)}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Flip the sign of \texttt{impact\_magnitude} to positive for all rows where a beneficial event has a negative impact.
+
+\bigskip
+
+\subsection*{4. Supplier \texttt{gate\_status = `fail'} but \texttt{is\_qualified = True} --- 12 rows}
+\textbf{Sheet:} \texttt{Supplier\_Ratings}\\
+\textbf{Problem:} 12 supplier rating rows show a failed qualification gate (score $< 4.0$) but the supplier is still marked as qualified. Global disqualification rule is violated.
+
+\begin{center}
+\begin{tabular}{lclccc}
+\toprule
+\textbf{entity\_id} & \textbf{Year} & \textbf{Criterion} & \textbf{raw\_value} & \textbf{gate} & \textbf{is\_qual} \\
+\midrule
+SUP-00045 & 2019--2023 & Compliance \& Sustainability & 3.78--3.99 & fail & \textcolor{critred}{True} \\
+SUP-00095 & 2018--2023 & Flexibility & 2.98--3.08 & fail & \textcolor{critred}{True} \\
+SUP-00094 & 2022 & Flexibility & 4.06 & fail & \textcolor{critred}{True} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Change \texttt{is\_qualified} to \texttt{False} for all 12 rows. Also, propagate: all other criteria rows for the same \texttt{entity\_id} + \texttt{year} should also be \texttt{is\_qualified = False}.
+
+\medskip
+\noindent\textbf{Note:} Row for SUP-00094 (\texttt{raw\_value} = 4.06) is a \textbf{double error}: a score of 4.06 should not trigger \texttt{gate\_status = `fail'} at all (threshold is $< 4.0$). Change its \texttt{gate\_status} to \texttt{`pass'}.
+
+\bigskip
+
+\subsection*{5. Buyer \texttt{gate\_status = `fail'} but \texttt{is\_qualified = True} --- 28 rows}
+\textbf{Sheet:} \texttt{Buyer\_Ratings}\\
+\textbf{Problem:} Same issue as \#4, but on the Buyer side. 28 buyer rating rows show failed gates but \texttt{is\_qualified} remains \texttt{True}. BUY-00008 fails Compliance and Financial gates across all 6 years, yet remains qualified.
+
+\begin{center}
+\begin{tabular}{lclccc}
+\toprule
+\textbf{entity\_id} & \textbf{Year} & \textbf{Criterion} & \textbf{raw\_value} & \textbf{gate} & \textbf{is\_qual} \\
+\midrule
+BUY-00008 & 2018--2023 & Compliance \& Reg. Standards & 2.94--3.14 & fail & \textcolor{critred}{True} \\
+BUY-00008 & 2018--2023 & Financial Stab. \& Creditworth. & 2.60--2.96 & fail & \textcolor{critred}{True} \\
+BUY-00012 & 2020--2022 & Financial Stab. \& Creditworth. & 3.98--4.09 & fail & \textcolor{critred}{True} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Change \texttt{is\_qualified} to \texttt{False} for all 28 rows, and propagate globally per \texttt{entity\_id} + \texttt{year}. Also: BUY-00012's scores of 4.04 and 4.09 should be \texttt{gate\_status = `pass'} (same threshold error as SUP-00094).
+
+\bigskip
+
+\subsection*{6. Inactive Suppliers with Active Relationships --- 16 rows}
+\textbf{Sheet:} \texttt{Relationships} $\times$ \texttt{Suppliers}\\
+\textbf{Problem:} SUP-00004, SUP-00034, and SUP-00062 are \texttt{active\_status = `Inactive'} but hold 16 \texttt{Active} relationships and 10 \texttt{Under Review} relationships.
+
+\medskip
+\noindent\textbf{Suggested correction:} Change \texttt{relationship\_status} to \texttt{Terminated} for all 16 Active rows and populate \texttt{end\_date}. Change the 10 \texttt{Under Review} rows to \texttt{Terminated} as well.
+
+\bigskip
+
+\subsection*{7. AHP Consistency Ratio Exceeds 0.10 Threshold --- 2 experts (18 rows)}
+\textbf{Sheet:} \texttt{AHP\_Weights}\\
+\textbf{Problem:} EXP-00002 has $CR = 0.1099$ and EXP-00007 has $CR = 0.1235$. Both exceed Saaty's maximum acceptable threshold of $CR \leq 0.10$. The \texttt{consistency\_status} column correctly says \texttt{inconsistent}, but the weights are still used in the dataset.
+
+\begin{center}
+\begin{tabular}{llcc}
+\toprule
+\textbf{expert\_id} & \textbf{scenario\_id} & \textbf{CR} & \textbf{target\_band} \\
+\midrule
+EXP-00002 & SCN-2023-FMC & \textcolor{critred}{0.1099} & moderately\_inconsistent \\
+EXP-00007 & SCN-2023-BUY & \textcolor{critred}{0.1235} & moderately\_inconsistent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Either regenerate these two AHP matrices to achieve $CR \leq 0.10$, or add an explicit \texttt{accepted\_override} flag explaining the deliberate inclusion.
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{\textcolor{warnyellow}{Significant Issues}}
+
+\subsection*{8. All 345 Relationships Start in 2018 --- No New Relationships in 2019--2023}
+\textbf{Sheet:} \texttt{Relationships}\\
+\textbf{Problem:} Every single \texttt{start\_date} falls in the year 2018. In a real supply chain spanning 6 years, new partnerships would form each year. This makes the temporal dimension of the relationship data unrealistic for ML training.
+
+\medskip
+\noindent\textbf{Suggested correction:} Distribute relationship \texttt{start\_date} values across 2018--2023 to simulate organic network growth.
+
+\bigskip
+
+\subsection*{9. AHP/Direct Weights Cover Only 3 of 42 Rating Scenarios}
+\textbf{Sheet:} \texttt{AHP\_Weights}, \texttt{Direct\_Weights} vs \texttt{Supplier\_Ratings}\\
+\textbf{Problem:} The Ratings sheets contain 42 unique scenarios (7 industries $\times$ 6 years). However, AHP and Direct Weight data only exist for 3 scenarios (\texttt{SCN-2023-AUT}, \texttt{SCN-2023-FMC}, \texttt{SCN-2023-BUY}). This means 40 out of 42 scenarios have no corresponding expert weighting data, and only 2 of 7 industries have supplier AHP weights.
+
+\medskip
+\noindent\textbf{Suggested correction:} Generate AHP/Direct Weight data for all 7 industries, and ideally across multiple years to support the time-series ML pipeline.
+
+\bigskip
+
+\subsection*{10. Delivery Performance Score Contradicts Actual Lead Times --- 11 rows}
+\textbf{Sheet:} \texttt{Relationships}\\
+\textbf{Problem:}
+\begin{itemize}[nosep]
+    \item \textbf{1 row:} \texttt{delivery\_performance = 9.2} (excellent) but \texttt{actual\_lead\_time} is 64\% over the agreed time ($14 \rightarrow 23$ days).
+    \item \textbf{10 rows:} \texttt{delivery\_performance} $\leq 3.0$ (terrible) but \texttt{actual\_lead\_time} $\leq$ \texttt{agreed\_lead\_time} (on time or early).
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{rel\_id} & \textbf{delivery\_perf} & \textbf{agreed} & \textbf{actual} & \textbf{Issue} \\
+\midrule
+REL-000267 & \textcolor{critred}{9.2} & 14 & 23 & Excellent but 64\% late \\
+REL-000021 & \textcolor{critred}{1.0} & 45 & 38 & Terrible but early \\
+REL-000024 & \textcolor{critred}{1.9} & 60 & 60 & Terrible but on time \\
+REL-000081 & \textcolor{critred}{2.1} & 30 & 30 & Terrible but on time \\
+\multicolumn{5}{c}{\emph{(+ 7 more rows)}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Suggested correction:} Recalculate \texttt{delivery\_performance} based on \texttt{actual\_lead\_time / agreed\_lead\_time} ratio, or regenerate these values with proper correlation.
+
+\bigskip
+
+\subsection*{11. Egypt Mapped to ``Middle East'' Instead of ``Africa'' --- 2 rows}
+\textbf{Sheet:} \texttt{Suppliers}\\
+\textbf{Problem:} SUP-00040 and SUP-00051 are in Egypt but their \texttt{region} is ``Middle East''. Geographically, Egypt is on the African continent.
+
+\medskip
+\noindent\textbf{Suggested correction:} Change \texttt{region} to \texttt{Africa} for both rows. \emph{(Note: This is debatable --- some business classifications group Egypt with Middle East. Choose based on your project's regional taxonomy.)}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{\textcolor{okgreen}{Minor / Informational}}
+
+\subsection*{12. Excellent Quality with 6 Disputes --- 1 row}
+\textbf{Sheet:} \texttt{Relationships}\\
+\textbf{Problem:} REL-000095 has \texttt{relationship\_quality = `Excellent'} but \texttt{dispute\_count = 6}. All other Excellent relationships average 0.8 disputes.
+
+\medskip
+\noindent\textbf{Suggested correction:} Either reduce \texttt{dispute\_count} to $\leq 2$, or downgrade \texttt{relationship\_quality} to \texttt{Acceptable}.
+
+\bigskip
+
+\subsection*{13. Inactive Suppliers Have Full 6-Year Rating Histories --- 162 rows}
+\textbf{Sheet:} \texttt{Supplier\_Ratings}\\
+\textbf{Problem:} The 3 inactive suppliers have ratings for all 6 years (2018--2023) with no indication of when they became inactive. No \texttt{deactivation\_year} column exists.
+
+\medskip
+\noindent\textbf{Suggested correction:} Add a \texttt{deactivation\_year} column to the \texttt{Suppliers} sheet and remove or flag ratings after that year.
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{\checkmark\; Verified --- No Issues Found}
+
+\begin{longtable}{clc}
+\toprule
+\textbf{\#} & \textbf{Check} & \textbf{Result} \\
+\midrule
+\endhead
+1 & Duplicate entity IDs & \textcolor{okgreen}{Pass} \\
+2 & \texttt{creation\_year + years\_in\_operation} consistency & \textcolor{okgreen}{Pass} \\
+3 & Raw values within 1.0--10.0 & \textcolor{okgreen}{Pass} \\
+4 & Normalized rating formula (benefit \& cost) & \textcolor{okgreen}{Pass} \\
+5 & AHP reciprocal property ($a_{ij} \times a_{ji} = 1.0$) & \textcolor{okgreen}{Pass} \\
+6 & AHP diagonal entries $= 1.0$ & \textcolor{okgreen}{Pass} \\
+7 & AHP/Direct weights sum to 1.0 & \textcolor{okgreen}{Pass} \\
+8 & Direct weight interpretation labels & \textcolor{okgreen}{Pass} \\
+9 & Saaty scale values (1--9 and reciprocals) & \textcolor{okgreen}{Pass} \\
+10 & Industry compatibility in relationships & \textcolor{okgreen}{Pass} \\
+11 & Scenario\_ID matches entity industry & \textcolor{okgreen}{Pass} \\
+12 & Events use correct criteria per entity type & \textcolor{okgreen}{Pass} \\
+13 & All orphan checks (IDs across sheets) & \textcolor{okgreen}{Pass} \\
+14 & Rating completeness (54 rows per entity) & \textcolor{okgreen}{Pass} \\
+15 & Contract values scale with buyer size & \textcolor{okgreen}{Pass} \\
+16 & Employee count scales with company size & \textcolor{okgreen}{Pass} \\
+17 & Revenue band scales with company size & \textcolor{okgreen}{Pass} \\
+18 & \texttt{end\_date} only on Terminated relationships & \textcolor{okgreen}{Pass} \\
+19 & All Terminated relationships have \texttt{end\_date} & \textcolor{okgreen}{Pass} \\
+20 & No self-referencing (buyer = supplier) & \textcolor{okgreen}{Pass} \\
+21 & No duplicate company names & \textcolor{okgreen}{Pass} \\
+22 & No duplicate buyer-supplier pairs & \textcolor{okgreen}{Pass} \\
+23 & Satisfaction vs Collaboration correlation ($r = 0.835$) & \textcolor{okgreen}{Pass} \\
+24 & Year-over-year rating jumps $\leq 3$ points & \textcolor{okgreen}{Pass} \\
+25 & Cost normalization inversion check & \textcolor{okgreen}{Pass} \\
+\bottomrule
+\end{longtable}
+
+\end{document}

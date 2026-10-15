@@ -42,7 +42,7 @@ class AppController:
         
         self.role_window = RoleSelectionWindow()
         self.role_window.role_selected.connect(self.show_main_window)
-        self.role_window.show()
+        self.role_window.showMaximized()
     
     def show_main_window(self, role: str) -> None:
         if self.role_window:
@@ -51,7 +51,7 @@ class AppController:
             self.role_window = None
             
         self.main_window = MainWindow(role=role, on_switch_role=self.show_role_selection)
-        self.main_window.show()
+        self.main_window.showMaximized()
 
 
 def main() -> None:

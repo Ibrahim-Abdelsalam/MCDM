@@ -57,7 +57,8 @@ class DatasetGenerationDialog(QDialog):
         self.worker: DatasetGenerationWorker | None = None
 
         self.setWindowTitle(f"Generate {entity_type.title()} Test Data")
-        self.setFixedSize(DIMENSIONS["dialog_width"], DIMENSIONS["dialog_height"])
+        self.setMinimumSize(DIMENSIONS["dialog_width"], DIMENSIONS["dialog_height"])
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)
 
         self._setup_ui()
 
@@ -250,4 +251,5 @@ class DatasetGenerationDialog(QDialog):
             
         # Update dialog to exactly the width needed for all columns
         dialog_width = max(DIMENSIONS["dialog_width"], table_width + 80)
-        self.setFixedSize(dialog_width, DIMENSIONS["dialog_height"])
+        self.setMinimumSize(dialog_width, DIMENSIONS["dialog_height"])
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)

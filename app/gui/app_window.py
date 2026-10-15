@@ -30,6 +30,7 @@ from app.gui.analyzer_dialog import DecisionAnalyzer
 from app.gui.company_dialog import CompanyManagerDialog
 from app.gui.dataset_dialog import DatasetGenerationDialog
 from app.gui.weight_dialog import WeightSchemeDialog
+from app.gui.criteria_dialog import CriteriaManagerDialog
 
 
 class MainWindow(QMainWindow):
@@ -157,6 +158,9 @@ class MainWindow(QMainWindow):
         manage_btn = QPushButton(f"Manage {role_title} Profiles")
         manage_btn.clicked.connect(self.open_company_manager)
         
+        criteria_btn = QPushButton("Manage Evaluation Criteria")
+        criteria_btn.clicked.connect(self.open_criteria_manager)
+        
         weights_btn = QPushButton("Manage Weight Schemes")
         weights_btn.clicked.connect(self.open_weight_manager)
         
@@ -167,6 +171,7 @@ class MainWindow(QMainWindow):
         gen_btn.style().polish(gen_btn)
 
         card_layout.addWidget(manage_btn)
+        card_layout.addWidget(criteria_btn)
         card_layout.addWidget(weights_btn)
         card_layout.addWidget(gen_btn)
         card_layout.addStretch()
@@ -227,6 +232,12 @@ class MainWindow(QMainWindow):
     def open_weight_manager(self) -> None:
         """Launch the weight scheme manager dialog modal."""
         dialog = WeightSchemeDialog(self.role, self)
+        dialog.exec()
+        self.refresh_dashboard_metrics()
+
+    def open_criteria_manager(self) -> None:
+        """Launch the criteria manager dialog modal."""
+        dialog = CriteriaManagerDialog(self.role, self)
         dialog.exec()
         self.refresh_dashboard_metrics()
 

@@ -15,7 +15,7 @@ class Normalizer:
     def vector_normalize(df: pd.DataFrame, criteria_config: CriteriaConfig) -> pd.DataFrame:
         """Normalize scores using vector normalization (Euclidean norm)."""
         result = df.copy()
-        criteria_names = list(CriteriaConfig.SUPPLIER_CRITERIA.keys()) + list(CriteriaConfig.BUYER_CRITERIA.keys())
+        criteria_names = list(CriteriaConfig.get_all_criteria("supplier").keys()) + list(CriteriaConfig.get_all_criteria("buyer").keys())
 
         for criterion_name in criteria_names:
             if criterion_name not in result.columns:
@@ -33,8 +33,8 @@ class Normalizer:
         """Normalize scores using min-max normalization, respecting benefit/cost types."""
         result = df.copy()
         all_criteria = {
-            **CriteriaConfig.SUPPLIER_CRITERIA,
-            **CriteriaConfig.BUYER_CRITERIA,
+            **CriteriaConfig.get_all_criteria("supplier"),
+            **CriteriaConfig.get_all_criteria("buyer"),
         }
 
         for criterion_name, criterion_info in all_criteria.items():

@@ -84,7 +84,7 @@ class CompanyManager:
     def validate_scores(self, scores_dict: dict[str, Any]) -> None:
         """Validate that scores match one complete criteria set in range."""
         score_keys = set(scores_dict.keys())
-        criteria_sets = [CriteriaConfig.SUPPLIER_CRITERIA, CriteriaConfig.BUYER_CRITERIA]
+        criteria_sets = [CriteriaConfig.get_all_criteria("supplier"), CriteriaConfig.get_all_criteria("buyer")]
 
         for criteria in criteria_sets:
             criteria_names = set(criteria.keys())

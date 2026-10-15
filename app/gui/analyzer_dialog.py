@@ -52,6 +52,7 @@ class DataPreviewDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Data Preview (Top 10 Rows)")
         self.setMinimumSize(800, 400)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)
         
         layout = QVBoxLayout(self)
         layout.setContentsMargins(14, 14, 14, 14)
@@ -113,7 +114,8 @@ class DecisionAnalyzer(QDialog):
 
         role_title = self.role.title()
         self.setWindowTitle(f"Decision Analyzer — {role_title} Evaluation")
-        self.setFixedSize(DIMENSIONS["dialog_width"], DIMENSIONS["dialog_height"] + 60)
+        self.setMinimumSize(DIMENSIONS["dialog_width"], DIMENSIONS["dialog_height"] + 60)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)
 
         self._setup_ui()
         self.on_data_source_changed()

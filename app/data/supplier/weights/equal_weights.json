@@ -3,13 +3,13 @@
   "entity_type": "supplier",
   "weights": {
     "Quality Performance": 1.0,
+    "Compliance and Sustainability": 1.0,
+    "Cost / Price Competitiveness": 1.0,
     "Delivery Performance": 1.0,
-    "Cost Competitiveness": 1.0,
+    "Experience and Track Record": 1.0,
     "Financial Stability": 1.0,
-    "Technical Capability": 1.0,
-    "Compliance & Sustainability": 1.0,
-    "Systems Integration": 1.0,
     "Flexibility": 1.0,
-    "Experience & Track Record": 1.0
+    "Systems Integration": 1.0,
+    "Technical Capability / Process Capability": 1.0
   }
 }

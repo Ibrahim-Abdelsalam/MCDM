@@ -95,7 +95,7 @@ class RoleSelectionWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Select Your Role")
-        self.setFixedSize(500, 380)
+        self.setMinimumSize(500, 380)
 
         self._setup_ui()
 

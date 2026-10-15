@@ -1,3 +1,4 @@
+
 """MCDM solver orchestrator that manages analysis workflow."""
 
 from __future__ import annotations

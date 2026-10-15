@@ -1,0 +1,78 @@
+{
+    "supplier": {
+        "Quality Performance": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Compliance and Sustainability": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Cost / Price Competitiveness": {
+            "type": "cost",
+            "range": [1, 10]
+        },
+        "Delivery Performance": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Experience and Track Record": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Financial Stability": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Flexibility": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Systems Integration": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Technical Capability / Process Capability": {
+            "type": "benefit",
+            "range": [1, 10]
+        }
+    },
+    "buyer": {
+        "Compliance & Regulatory Standards": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Demand Stability & Predictability": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Financial Stability & Creditworthiness": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Long-Term Strategic Value": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Market Reputation & Brand Impact": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Order Volume & Growth Potential": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Payment Performance": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Responsiveness & Collaboration": {
+            "type": "benefit",
+            "range": [1, 10]
+        },
+        "Technical Sophistication (Systems)": {
+            "type": "benefit",
+            "range": [1, 10]
+        }
+    }
+}

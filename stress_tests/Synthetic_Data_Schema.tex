@@ -1,0 +1,109 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\title{\textbf{Synthetic Dataset Architecture \& Schema Documentation}\\
+\large Bi-Directional Decision Support System (MCDM-ML)}
+\author{Data Engineering Phase}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document outlines the structural schema of the generated synthetic dataset (\texttt{example\_synthetic\_data.xlsx}). The dataset acts as the foundational ``Historical Performance Data'' layer required to train Machine Learning (ML) prediction models and validate the Fuzzy Analytic Hierarchy Process (FAHP) evaluation engines. 
+
+The workbook is divided into distinct sheets that separate static entity profiles, subjective expert weightings, longitudinal (time-series) evaluations, and operational relationship outcomes.
+
+\section{Sheet Breakdown and Schema}
+
+\subsection{1. Metadata Sheet}
+Contains the global parameters used during the generation sequence.
+\begin{itemize}
+    \item \textbf{Generation Timestamp:} When the dataset was created.
+    \item \textbf{Random Seed:} Ensures cryptographic reproducibility of the dataset.
+    \item \textbf{Time Horizon:} The start and end years (e.g., 2018--2026) dictating the longitudinal scope of the time-series logs.
+\end{itemize}
+
+\subsection{2. Buyers \& Suppliers Sheets (Entity Profiles)}
+These two sheets contain the static profiles and hidden statistical variables (Latent Factors) for every entity in the market.
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Column Name} & \textbf{Description} \\
+\midrule
+\texttt{entity\_id} & Unique identifier (e.g., BUY-0001, SUP-0042). \\
+\texttt{industry} & The market sector (e.g., Automotive, Electronics). \\
+\texttt{region} & Geographical location (used for proximity bonuses). \\
+\texttt{company\_size} & Small, Medium, Large, or Enterprise (dictates capacity). \\
+\texttt{creation\_year} & The year the entity entered the simulation. \\
+\texttt{[latent\_factors]} & The hidden Z-scores (e.g., \textit{operational\_capability}, \textit{financial\_health}) acting as the entity's foundational DNA. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{3. AHP Weights Sheets (Buyer \& Supplier Priorities)}
+These sheets store the normalized eigenvector weights representing the strategic priorities of the entities. In the real system, these are derived from FAHP pairwise matrices.
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Column Name} & \textbf{Description} \\
+\midrule
+\texttt{entity\_id} & The ID of the evaluating entity. \\
+\texttt{[9x Criteria]} & The explicit percentage weight (summing to 1.0) assigned to each of the 9 evaluation criteria. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{4. Ratings Sheets (Time-Series Logs)}
+These sheets contain the longitudinal observable scores. This is the primary \textbf{Feature Matrix (X)} for the Machine Learning model.
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Column Name} & \textbf{Description} \\
+\midrule
+\texttt{period\_year} & The chronological timestamp of the evaluation (e.g., 2021). \\
+\texttt{entity\_id} & The company being evaluated. \\
+\texttt{[9x Criteria]} & The 1.0 to 10.0 observable ratings derived from the latent factors, incorporating AR(1) temporal drift and exogenous shocks. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{5. Relationships Sheet (Operational Outcomes)}
+This sheet represents the output of the Capacity-Constrained Bipartite Matching algorithm. It serves as the \textbf{Target Variable (Y)} for Machine Learning training.
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Column Name} & \textbf{Description} \\
+\midrule
+\texttt{relationship\_id} & Unique identifier for the contract edge. \\
+\texttt{buyer\_id / supplier\_id} & The paired entities. \\
+\texttt{start\_date / end\_date} & The lifecycle of the partnership. \\
+\texttt{actual\_lead\_time} & Simulated physical delay (e.g., 45 days). \\
+\texttt{dispute\_count} & Number of operational conflicts during the period. \\
+\texttt{relationship\_quality} & Categorical label (e.g., Excellent, Weak, Terminated). \\
+\texttt{collaboration\_score} & The final 1.0 to 10.0 synergy score determining success. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Machine Learning Pipeline Mapping}
+To fulfill the ``Machine Learning Integration'' stage of the framework:
+\begin{enumerate}
+    \item \textbf{Input (Features):} The ML model will ingest the \texttt{period\_year} rows from the \textbf{Ratings} sheets.
+    \item \textbf{Target (Labels):} The ML model will train against the \texttt{dispute\_count} and \texttt{collaboration\_score} columns from the \textbf{Relationships} sheet.
+    \item \textbf{Objective:} To predict $Y$ (Future Relationship Quality) given $X$ (Historical Time-Series Ratings).
+\end{enumerate}
+
+\end{document}

@@ -41,7 +41,7 @@ from app.gui.widgets import build_criterion_form, confirm_delete, make_scroll_ar
 class CompanyManagerDialog(QDialog):
     """Dialog to manage company records (add, view, remove).
 
-    Allows users to toggle scores for the 9 fixed MCDM criteria and validates inputs.
+    Allows users to toggle scores for the dynamic MCDM criteria and validates inputs.
     """
 
     def __init__(self, entity_type: str, parent: QWidget | None = None) -> None:
@@ -57,7 +57,8 @@ class CompanyManagerDialog(QDialog):
         self.criteria_names = CriteriaConfig.get_criteria_names(self.entity_type)
 
         self.setWindowTitle(f"Manage {entity_type.title()}s")
-        self.setFixedSize(DIMENSIONS["dialog_width"], DIMENSIONS["dialog_height"])
+        self.setMinimumSize(DIMENSIONS["dialog_width"], DIMENSIONS["dialog_height"])
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)
 
         self._setup_ui()
         self.refresh_table()
@@ -108,7 +109,7 @@ class CompanyManagerDialog(QDialog):
         name_layout.addStretch()
         tab_layout.addLayout(name_layout)
 
-        # Scrollable form for the 9 criteria
+        # Scrollable form for the criteria
         form_widget, self.spin_rows = build_criterion_form(self.criteria_names)
         scroll_area = make_scroll_area(form_widget)
         tab_layout.addWidget(scroll_area)
@@ -241,7 +242,8 @@ class CompanyManagerDialog(QDialog):
             
         # Update dialog to exactly the width needed for all columns
         dialog_width = max(DIMENSIONS["dialog_width"], table_width + 80)
-        self.setFixedSize(dialog_width, DIMENSIONS["dialog_height"])
+        self.setMinimumSize(dialog_width, DIMENSIONS["dialog_height"])
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)
 
     def remove_selected_company(self) -> None:
         """Remove the selected company or checked companies from the data storage."""
